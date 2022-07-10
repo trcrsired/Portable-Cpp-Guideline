@@ -155,3 +155,51 @@ vector.cc:1:9: fatal error: vector: No such file or directory
 compilation terminated.
 */
 ```
+
+### Avoid ```<ranges>``` and ```<iterator>```
+
+You may want to use concepts like ```std::random_access_range```, ```std::contiguous_range```. Unfortunately, they are not freestanding either. A suggestion is that you should keep your design simple and stick to pointers as much as possible.
+
+## Heap
+
+Yes, I know ```<new>``` is freestanding. However, C++ standard does not design it to be truly useful. They throw exceptions very chaotically.
+
+### Avoid ```std::nothrow```
+
+NEVER use ```std::nothrow``` and ```std::nothrow_t```. C++ standard library implements nothrow new with thrown new. Even worse, the C++ standard does not. There is no reason to use it.
+
+
+```cpp
+/*
+Do not use new (std::nothrow_t) in any form. It is just horrible.
+
+Here is the implementation from libsupc++ in GCC.
+https://github.com/gcc-mirror/gcc/blob/aa2eb25c94cde4c147443a562eadc69de03b1556/libstdc%2B%2B-v3/libsupc%2B%2B/new_opnt.cc#L31
+*/
+
+_GLIBCXX_WEAK_DEFINITION void *
+operator new (std::size_t sz, const std::nothrow_t&) noexcept
+{
+  // _GLIBCXX_RESOLVE_LIB_DEFECTS
+  // 206. operator new(size_t, nothrow) may become unlinked to ordinary
+  // operator new if ordinary version replaced
+  __try
+    {
+      return ::operator new(sz);
+    }
+  __catch (...)
+    {
+      // N.B. catch (...) means the process will terminate if operator new(sz)
+      // exits with a __forced_unwind exception. The process will print
+      // "FATAL: exception not rethrown" to stderr before exiting.
+      //
+      // If we propagated that exception the process would still terminate
+      // (because this function is noexcept) but with a less informative error:
+      // "terminate called without active exception".
+      return nullptr;
+    }
+}
+
+```
+
+We can see C++ standard library implements nothrow version's operator new with thrown version's new. It is completely useless.
