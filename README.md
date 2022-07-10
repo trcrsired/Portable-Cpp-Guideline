@@ -166,7 +166,7 @@ Yes, I know ```<new>``` is freestanding. However, C++ standard does not design i
 
 ### Avoid ```std::nothrow```
 
-NEVER use ```std::nothrow``` and ```std::nothrow_t```. C++ standard library implements nothrow new with thrown new. Even worse, the C++ standard does not. There is no reason to use it.
+NEVER use ```std::nothrow``` and ```std::nothrow_t```. C++ standard library implements nothrow new with thrown new. Even worse, the C++ standard does not allow override the default impementations for operator new(std::nothrow_t const&) as operator new() does. There is no reason to use it.
 
 
 ```cpp
