@@ -22,7 +22,7 @@ https://bitbucket.org/ejsvifq_mabmip/windows-hosted-x86_64-elf-toolchains
 
 ### Avoid ```std::addressof``` and ```operator &```
 
-C++ allows overloading operator &, which is a historical mistake. ISO C++ 11 standard introduces std::addressof that would fix the issue. C++17 allows std::addressof to be freestanding Unfortunately, std::addressof is in <memory> header, which is not freestanding. The std::addressof is impossible to implement in C++ without compiler magic.
+C++ allows overloading operator &, which is a historical mistake. ISO C++ 11 standard introduces std::addressof that would fix the issue. C++17 allows std::addressof to be constexpr Unfortunately, ```std::addressof``` is in ```<memory>``` header, which is not freestanding. The std::addressof is impossible to implement in C++ without compiler magic.
 
 ```cpp
 //bad! memory header may not be available.
@@ -68,7 +68,7 @@ Compilation success
 
 ```std::move```, ```std::forward``` and ```std::move_if_noexcept``` are in ```<utility>``` header, which are not freestanding.
 
-The safest thing is to write them by yourself. Unfortunately, recently clang adds a patch that would treat ```std::move```, ```std::forward```, ```std::addressof```, ```std::__addressof``` and ```std::move_if_noexcept``` as compiler magics which means we cannot get 100% efficiency by writing by ourselves.
+The safest thing is to write them by yourself. Unfortunately, recently clang 15 added a patch that would treat ```std::move```, ```std::forward```, ```std::addressof```, ```std::__addressof``` and ```std::move_if_noexcept``` as compiler magics which means we cannot get 100% efficiency by writing by ourselves.
 
 ```cpp
 //bad! utility header may not be available.
@@ -128,5 +128,30 @@ int main()
 
 /*
 x86_64-elf-g++ -c carray.cc -O3 -std=c++23 -s -flto
+*/
+```
+
+
+### Avoid all C++ containers, iterators, algorithms, allocators
+
+None of the C++ Containers, Iterators, Algorithms, and Allocators are freestanding, and they won't be freestanding soon due to deeply complex designs interacting with heap and exception handling. (We will explain why in the next few chapters.)
+
+By C++ Core Guideline or "modern" C++ books, ```std::vector``` should be the default container. However,        ```<vector>``` is not freestanding. Including them creates a portability issue. Allocators are not freestanding either, and even ```std::allocator``` is freestanding (which it cannot due to interacting with exceptions), the vector itself will throw ```std::logic_error``` in methods like ```push_back()```. Disabling Exceptions handling will not remove the dependencies to exceptions which still cause either linkage errors or binary bloat issues.
+
+```cpp
+/// WRONG!!! <vector> is not freestanding
+#include<vector>
+#include<cstdint>
+
+int main()
+{
+	std::vector<::std::int_least32_t> vec;
+}
+/*
+D:\Desktop>x86_64-elf-g++ -c vector.cc -O3 -std=c++23 -s -flto
+vector.cc:1:9: fatal error: vector: No such file or directory
+    1 | #include<vector>
+      |         ^~~~~~~~
+compilation terminated.
 */
 ```
