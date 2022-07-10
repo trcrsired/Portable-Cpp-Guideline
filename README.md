@@ -235,7 +235,7 @@ I know you will try to make an argument that you want to load large files like i
 #### Advantages
 1. Memory mapping avoids the issue of file size overflow on 32 bits machine.
 2. It avoids messing up the CRT heap and never triggers allocation failure from malloc or new.
-3. It avoids copying the content from kernel space to user space, compared to loading the entire file to 
+3. It avoids copying the content from kernel space to user space, compared to loading the entire file to a ```std::string```
 4. Memory mapping allows file sharing among different processes, saving your physical memory.
 5. fseek(3) or seek(2) to load file may create more TOCTOU security vulnerabilities.
 6. The overcommit is less likely if you do not write to the copy-on-write pages.
