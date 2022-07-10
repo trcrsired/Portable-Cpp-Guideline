@@ -357,7 +357,38 @@ Reasons:
 #pragma once
 #include<Windows.h>
 ```
-If you want to use win32 or nt APIs, import them by yourself.
+If you want to use win32 or nt APIs, import them by yourself. ```NEVER USE extern "C" to import APIs.```
+
+```cpp
+#pragma once
+//Wrong! Here is the wrong way to import APIs.
+namespace mynamespace::nt
+{
+struct io_status_block
+{
+union
+{
+	std::uint_least32_t Status;
+	void*    Pointer;
+} DUMMYUNIONNAME;
+std::uintptr_t Information;
+};
+
+using pio_apc_routine = void (*)(void*,io_status_block*,std::uint_least32_t) noexcept;
+
+#if defined(_MSC_VER) && !defined(__clang__)
+__declspec(dllimport)
+#elif __has_cpp_attribute(__gnu__::__dllimport__)
+[[__gnu__::__dllimport__]]
+#endif
+extern "C" std::uint_least32_t __stdcall ZwWriteFile(void*,void*,pio_apc_routine,void*,io_status_block*,
+				void const*,std::uint_least32_t,std::int_least64_t*,std::uint_least32_t*) noexcept;
+
+}
+
+#include<windows.h>
+//BOOM!! Compiler complains.
+```
 
 ```cpp
 //GOOD:
