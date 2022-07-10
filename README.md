@@ -389,8 +389,43 @@ Kernels usually just ban the usage for floating points.
 
 ### Use std::bit_cast for dealing with floating point types if you want treat them as integers.
 
+Pointer tricks would easily violate strict-aliasing rule. See
+https://gist.github.com/shafik/848ae25ee209f698763cffee272a58f8
+
+```c
+//BAD
+float Q_rsqrt( float number )
+{
+	long i;
+	float x2, y;
+	const float threehalfs = 1.5F;
+
+	x2 = number * 0.5F;
+	y  = number;
+	i  = * ( long * ) &y;                       // evil floating point bit level hacking
+	i  = 0x5f3759df - ( i >> 1 );               // what the fuck? 
+	y  = * ( float * ) &i;
+	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+
+	return y;
+}
 ```
 
+```cpp
+//GOOD
+#include <bit>
+#include <limits>
+#include <cstdint>
+
+constexpr float Q_rsqrt(float number) noexcept
+{
+	static_assert(std::numeric_limits<float>::is_iec559); // (enable only on IEEE 754)
+
+	float const y = std::bit_cast<float>(
+        0x5f3759df - (std::bit_cast<std::uint32_t>(number) >> 1));
+	return y * (1.5f - (number * 0.5f * y * y));
+}
 ```
 
 ## Todo: Threads
