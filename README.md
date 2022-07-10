@@ -338,4 +338,6 @@ Watch video: https://www.youtube.com/watch?v=ARYP83yNAWk
 
 ## Todo: OOP
 
+## Todo: Windows specific
+
 ## Todo: OTHER ISSUES
