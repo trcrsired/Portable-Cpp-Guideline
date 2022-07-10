@@ -531,4 +531,15 @@ GCC for windows targets have three different threading ABIs. win32, posix and mc
 
 clang does not implement GCC's ABI correct for windows. Just avoid ```thread_local``` and ```_Thread```.
 
+### Beware ABI for win32, posix and mcf of GCC libstdc++-6.dll
+
+They are three different ABIs, and iostream will break if you link to the wrong GCC C++ standard library runtime (libstdc++-6.dll).
+
+### It is a good idea to run, test and benchmark your Windows Applications on WINE.
+
+Running Windows applications on Linux with WINE has substantial benefits in avoiding issues like ABIs.
+
+Do not forget to export WINEPATH environment in $HOME/.bashrc to include C++ standard libraries dlls like libstdc++-6.dll.
+
+
 ## Todo: OTHER ISSUES
