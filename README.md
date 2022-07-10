@@ -222,15 +222,17 @@ One design failure with C and C++ is that stack exhaustion is undefined behavior
 
 #### There is no way that you can always handle heap allocation failure to avoid crashing.
 
+In general, you should prefer just call ```std::abort``` if ```malloc(3)``` fails.
+
 1. Destructors can allocate memory again. That creates a vicious cycle and nobody knows what could happen.
 2. The implementation of GCC libsupc++ uses an emergency heap. However, implementing an emergency would still call ```std::terminate``` in many situations. So you can still get crashing even if it has an "emergency heap." I made the operator a new crash for allocation failure, removed the emergency heap from the libsupc++, and found no issues. No ABI issues. Nothing.
 3. Many libraries beneath you, including Glibc, would call xmalloc, which will still crash for malloc failure. You cannot avoid the issue unless you control all your source code.
 4. Operating Systems like Linux would overcommit and kill your process if you hit allocation failures. In general, programming languages like C++ cannot just handle allocation failures in any meaningful way, neither stack nor heap.
-
+5. C++ new throws exceptions. C++ codebase will usually allocate memory on the heap with new, creating tons of invisible code-path and potential exception-safety bugs.
 
 #### If you want to load large files, consider memory mapping API.
 
-I know you will try to make an argument that you want to load large files like image to memory for example. I am sorry, you are usually doing the wrong thing. Instead, you should use fstat(2) or Linux's statx syscall + memory mapping. 
+I know you will try to make an argument that you want to load large files like image to memory for example. I am sorry, you are usually doing the wrong thing. Instead, you should use fstat(2) or Linux's statx syscall + memory mapping.
 
 ##### Advantages
 1. Memory mapping avoids the issue of file size overflow on 32 bits machine.
@@ -297,3 +299,31 @@ int main()
 }
 ```
 
+## Exceptions
+
+C++ exception is probably the largest issue for portability. Even Linus Torvalds complaint about C++ EH before.
+
+http://harmful.cat-v.org/software/c++/linus
+
+### Many platforms do not provide exceptions.
+1. C++ exception handling ABI relies on hosted C++ features, and many need operating system support. However, you are writing an operating system; for example, you do not have exceptions.
+2. Architectures like AVR, and wasm cannot natively throw exceptions. wasm32-wasi simply has no exception handling support. (EMSCRIPTEN IS NOT wasm32-wasi) Furthermore, tools like wasm2lua (https://github.com/SwadicalRag/wasm2lua) allow you to compile C++ code to Lua. However, Lua can't implement C++-style exception handling without tons of human effort and severe performance hits.
+3. C++ exceptions on many platforms are extremely slow for both happy and slow paths. SJLJ exception is a typical implementation for many platforms, including 32 bits operating systems and scripting. The performance hit is enormous.
+4. Not every architecture support C++ exceptions, and the implementation difficulty may be very significant.
+5. C++ exceptions need heap, which we mentioned as another huge issue.
+6. C++ exception runtime is enormous. It is usually 100kb, which may be unacceptable for many embedded systems.
+7. C++ exceptions bloat binary size with your code size. That may be another unacceptable factor for many embedded systems.
+
+### C++ exceptions always slow down performance. They are not "zero-overhead" abstractions.
+
+1. Many platforms do not implement table-based exception handling models.
+2. Exceptions always hurt compiler optimizations. (No matter whether it is table-based or sjlj-based.)
+3. Exceptions always hurt TLB, BTB, cache and pages locality. (No matter whether it is table-based or sjlj-based.)
+4. C++ Exception handling does not work very well with ASLR (Address space layout randomization) and PIC (position independent code). This is because the loaders must relocate all exception table pointers. Recently, security papers have talked about how to make that work with the PIC but will break ABIs. (No matter whether it is table-based or sjlj-based.)
+5. C header files usually do not mark their functions correctly with ```noexcept```. That not only creates the issue for performance but they are technically ODR violations. Calling C apis that are not noexcept-marked are just ```undefined-behaviors```. (No matter whether it is table-based or sjlj-based.)
+6. Throwing C++ exceptions is extremely costly. It can be 200x and 300x slower than a syscall instruction on ```x86_64```.
+7. C++ exceptions do not work well in multithreadings systems. See ```C++ exceptions are becoming more and more problematic``` ( https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html ).
+8. Statistics shows 95% of exceptions are just programming bugs. They just create issues for exception-safety and performance issues. Those cases should use assertion or even ```std::terminate``` to deal with instead of throwing exceptions.
+
+### In general, C++ Exceptions are just horrible. Herb Sutter's P0709R0 is our only hope.
+Watch video: https://www.youtube.com/watch?v=ARYP83yNAWk
