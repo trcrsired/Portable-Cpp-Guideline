@@ -513,6 +513,20 @@ win32_file file(u8"a.txt");
 
 GCC for windows targets have three different threading ABIs. win32, posix and mcf. Only posix would provide ```<pthread.h>```. Users may use win32 or mcf. Your compilation will break. They may break C++ standard library too and libstdc++ does not provide ```<thread>``` and ```<mutex>``` headers for win32. ```LLVM libc++``` makes this mistake and that is why libc++ is not available for windows targets.
 
+
+```cpp
+//BAD!!
+#include<pthread.h>
+```
+```cpp
+//BAD!!
+#include<thread>
+```
+```cpp
+//BAD!!
+#include<mutex>
+```
+
 ### Avoid ```thread_local``` and ```_Thread``` for cpu-windows-gnu clang targets
 
 clang does not implement GCC's ABI correct for windows. Just avoid ```thread_local``` and ```_Thread```.
