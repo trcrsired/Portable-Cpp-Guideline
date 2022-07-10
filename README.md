@@ -1,4 +1,4 @@
-# Portable-C++-Guideline
+# Portable C++ Guideline
 
 Have you ever tried to make your C++ code maximumly portable and efficient? Here is a guideline that helps your write portable and efficient C++ code.
 
@@ -211,7 +211,7 @@ In short, you cannot assume there is a default heap that is available.
 
 Reasons:
 1. There is simply no heap. (I know you would argue you can always provide one, but the reality is harsh, my friend.)
-2. Many heaps are available. This situation usually happens within operating system kernels (and even win32 applications with the abi compatibility issue between msvcrt and universal crt) where they provide multiple heaps. Making any of the defaults may be very wrong. For example, the Windows kernel provides different heaps; one is interrupt-safe while space is limited, but the others are not but space is space.
+2. Many heaps are available. This situation usually happens within operating system kernels (and even win32 applications with the abi compatibility issue between msvcrt and universal crt) where they provide multiple heaps. Making any of the defaults may be very wrong. For example, the Windows kernel provides different heaps; one is interrupt-safe while space is limited, but the others are not but space is sufficient.
 3. C++ does not provide a thread-local implementation of the heap. The default heap might be highly inefficient. (Of course, thread-local storage might not be available, but that is a separate issue.)
 
 We can see forcing a default heap implementation never works out for a portable codebase. Just avoid new.
