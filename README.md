@@ -240,6 +240,7 @@ I know you will try to make an argument that you want to load large files like i
 5. fseek(3) or seek(2) to load file may create more TOCTOU security vulnerabilities.
 6. The overcommit is less likely if you do not write to the copy-on-write pages.
 7. Memory mapping creates ```std::contiguous_range``` which is extremely useful for many workflows.
+8. You can write to memory-mapped memory without changing the file's content if you load the pages with private pages. However, writing content to the memory region will trigger a page fault, and the operating system kernel will allocate new pages for your process.
 
 ```cpp
 /*
@@ -271,7 +272,7 @@ if (buffer)
 
 ```
 
-Libraries like ```fast_io``` provide direct support for file loading and handling all the corner cases for you, including transparent support for platforms that do not offer memory mapping (like web assembly).
+Libraries like ```fast_io``` provide direct support for file loading and handling all the corner cases for you, including transparent support for platforms that do not offer memory mapping (like web assembly). The memory is writable.
 
 https://github.com/cppfastio/fast_io
 
