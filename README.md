@@ -55,6 +55,7 @@ int main()
 	int a{};
 	int *pc{__builtin_addressof(a)};
 //Ok. GCC, clang and MSVC all support __builtin_addressof. It is safe to use it.
+//Maybe some compilers don't support __builtin_addressof? Then we are screwed up for sure. That is the C++ standard to blame
 }
 
 /*
