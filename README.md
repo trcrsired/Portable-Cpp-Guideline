@@ -228,11 +228,11 @@ One design failure with C and C++ is that stack exhaustion is undefined behavior
 4. Operating Systems like Linux would overcommit and kill your process if you hit allocation failures. In general, programming languages like C++ cannot just handle allocation failures in any meaningful way, neither stack nor heap.
 
 
-### If you want to load large files, consider memory mapping API.
+#### If you want to load large files, consider memory mapping API.
 
 I know you will try to make an argument that you want to load large files like image to memory for example. I am sorry, you are usually doing the wrong thing. Instead, you should use fstat(2) or Linux's statx syscall + memory mapping. 
 
-#### Advantages
+##### Advantages
 1. Memory mapping avoids the issue of file size overflow on 32 bits machine.
 2. It avoids messing up the CRT heap and never triggers allocation failure from malloc or new.
 3. It avoids copying the content from kernel space to user space, compared to loading the entire file to a ```std::string```
