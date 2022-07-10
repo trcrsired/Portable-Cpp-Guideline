@@ -327,3 +327,15 @@ http://harmful.cat-v.org/software/c++/linus
 
 ### In general, C++ Exceptions are just horrible. Herb Sutter's P0709R0 is our only hope.
 Watch video: https://www.youtube.com/watch?v=ARYP83yNAWk
+
+## Todo: IO
+
+## Todo: Integers
+
+## Todo: Floating Points
+
+## Todo: Threads
+
+## Todo: OOP
+
+## Todo: OTHER ISSUES
