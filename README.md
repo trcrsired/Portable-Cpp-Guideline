@@ -332,7 +332,66 @@ Watch video: https://www.youtube.com/watch?v=ARYP83yNAWk
 
 ## Todo: Integers
 
-## Todo: Floating Points
+### ```::std::size_t``` should be your default integer types. Not ```int```.
+
+C++ standard never said how large ```sizeof(int)``` is. They have caused a lot of troubles.
+
+```
+//HORRIBLE!!! This is undefined-behavior if vec.size() is larger than INT_MAX.
+for(int i{};i!=vec.size();++i)
+{
+}
+```
+
+Exceptionals: APIs that use int. ```int main()``` for example.
+
+### Do not assume ```char```, ```wchar_t```, ```char8_t```, ```char16_t``` and ```char32_t``` are character types. They are just integer types.
+
+That assumptions randomly create undefined behavior. One notorious example is C++ iostream.
+
+```cpp
+//libc might define int8_t as char
+int8_t i{},*p{__builtin_addressof(i)};
+std::cout<<p;//DANGER!!!
+std::cout<<std::format("{}\n",p);//DANGER!!!
+```
+
+### Prefer integer types in ```<cstdint>``` than basic integer types
+
+They have the same issue with int. C++ standard never said how large sizeof(T) for short, int, long and long long.
+
+
+### Prefer ```::std::uint_leastxx_t``` over ```::std::uintxx_t```
+
+Types like ::std::uintxx_t are optional and may not exist. They happen when a single byte in some architectures is not 8 bits which might save a lot of money for specific embedded systems. For maximumly portable code, just use ```::std::uint_leastxx_t```
+
+### Avoid __uint128_t for GCC and clang
+
+Reasons:
+1. They only exist for 64 bits targets.
+2. Even 64 bits targets do not generate good code for compilers. Better way is to unpack ```__uint128_t``` to two ```::std::uint_least64_t```.
+
+### Do not use ```::std::uintmax_t``` and ```::std::intmax_t```
+
+They have caused a lot of troubles for ABI stablities issues for C and C++. Just do not use them.
+
+## Floating Points
+
+Short answer: Do not assume floating points exist!!! Just do not use them in portable code.
+
+### Floating points might use extra registers which kernel is not willing to save.
+
+Kernels usually just ban the usage for floating points.
+
+### Soft floating points are very slow on hardwares that could not provide floating points arithmatics
+
+### ```<cmath>``` APIs touch ```math_errhandling``` which cause a lot troubles
+
+### Use std::bit_cast for dealing with floating point types if you want treat them as integers.
+
+```
+
+```
 
 ## Todo: Threads
 
