@@ -1,10 +1,10 @@
-**# Portable C++ Guideline
+# Portable C++ Guideline
 
 Have you ever tried to make your C++ code maximumly portable and efficient? Here is a guideline that helps your write portable and efficient C++ code.
 
 You may ask why I created this guideline? The reason is that guidelines like C++ Core Guideline usually teach unportable and problematic coding practices that only promote the portability trap.
 
-Remember, there is no zero-cost / zero-overhead (Runtime) abstraction. Anyone who tries to sell you those concepts is just falsely advertising. All abstractions have runtime overhead, including Borrow Checkers and C++ exceptions.
+Remember, there is no zero-cost / zero-overhead (Runtime) abstraction. Anyone who tries to sell you those concepts is just falsely advertising. All abstractions have runtime overhead, including Borrow Checkers ( https://blog.polybdenum.com/2021/08/09/when-zero-cost-abstractions-aren-t-zero-cost.html ) and C++ exceptions ( https://devblogs.microsoft.com/oldnewthing/20220228-00/?p=106296 ).
 
 Current C++ standard is C++23.
 
@@ -637,4 +637,3 @@ Do not forget to export WINEPATH environment in $HOME/.bashrc to include C++ sta
 
 
 ## Todo: OTHER ISSUES
-**
