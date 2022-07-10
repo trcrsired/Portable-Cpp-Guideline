@@ -338,6 +338,144 @@ Watch video: https://www.youtube.com/watch?v=ARYP83yNAWk
 
 ## Todo: OOP
 
-## Todo: Windows specific
+## Windows specific
+
+### Guard Windows specific code with ```#if (defined(_WIN32) && !defined(__WINE__)) || defined(__CYGWIN__)```
+
+In general, you should think about things like CYGWIN/MSYS2 exist. wine-gcc will define _WIN32 macros for POSIX compliant hosted GCC compilers, which are incorrect on Linux, FreeBSD, etc. That is why we should also exclude ```__WINE__```
+
+### Do not ```#include<windows.h>``` in public headers
+
+Reasons:
+1. Many libraries like ```boost``` include the header as ```#include<Windows.h>```, which causes issues for cross compilations since UNIX filesystems are ```case-sensitive```. The GCC and clang compiler will not find that header.
+2. Windows APIs are not correctly marked as noexcept.
+3. It compiles very slow.
+4. They introduce macros like ```min``` and ```max``` which will break C++ standard libraries.
+
+```cpp
+//BAD:
+#pragma once
+#include<Windows.h>
+```
+If you want to use win32 or nt APIs, import them by yourself.
+
+```cpp
+//GOOD:
+#pragma once
+namespace mynamespace::nt
+{
+struct io_status_block
+{
+union
+{
+	std::uint_least32_t Status;
+	void*    Pointer;
+} DUMMYUNIONNAME;
+std::uintptr_t Information;
+};
+
+using pio_apc_routine = void (*)(void*,io_status_block*,std::uint_least32_t) noexcept;
+
+#if defined(_MSC_VER) && !defined(__clang__)
+__declspec(dllimport)
+#elif __has_cpp_attribute(__gnu__::__dllimport__)
+[[__gnu__::__dllimport__]]
+#endif
+extern std::uint_least32_t __stdcall ZwWriteFile(void*,void*,pio_apc_routine,void*,io_status_block*,
+				void const*,std::uint_least32_t,std::int_least64_t*,std::uint_least32_t*) noexcept
+#if defined(__clang__) || defined(__GNUC__)
+#if SIZE_MAX<=UINT_LEAST32_MAX &&(defined(__x86__) || defined(_M_IX86) || defined(__i386__))
+#if !defined(__clang__)
+__asm__("ZwWriteFile@36")
+#else
+__asm__("_ZwWriteFile@36")
+#endif
+#else
+__asm__("ZwWriteFile")
+#endif
+#endif
+;
+
+}
+
+/*
+Ignore the part that deals with name mangling for Visual C++.
+See here:
+https://github.com/trcrsired/fast_io/blob/master/include/fast_io_hosted/platforms/win32/msvc_linker.h
+*/
+```
+
+### Call ```A``` APIS for Windows 9x kernels and ```W``` APIS for Windows NT kernels.
+
+On Windows 95/98 and ME, only A Apis are available. W apis do exist but they do not do anything.
+
+On Windows NT-based systems, including Windows 10, you should use W APIs and avoid A APIs. The problem is that Windows Locale will influence the behavior of A APIs and cause issues. All NT apis are unicode APIs.
+
+You can import those APIs with C++ ```char8_t``` and ```char16_t```. That will get rid of the troubles for ```wchar_t``` and execution charset.
+
+```cpp
+//Use if constexpr to trivialize the API calls.
+
+namespace mynamspace
+{
+
+enum class win32_family
+{
+ansi_9x,
+wide_nt,
+#ifdef _WIN32_WINDOWS
+native = ansi_9x
+#else
+native = wide_nt
+#endif
+};
+
+template<typename... Args>
+inline void* my_create_file(Args... args) noexcept
+{
+	if constexpr(win32_family::native==win32_family::ansi_9x)
+	{
+		//Call A apis for Windows 95
+		return ::mynamespace::win32::CreateFileA(args...);
+	}
+	else
+	{
+		//Call W apis for Windows NT
+		return ::mynamespace::win32::CreateFileW(args...);
+	}
+}
+
+}
+
+```
+
+This rule applies to CRT APIs, including fopen(3) _fdopen(3). You should _wfdopen for windows NT (Yes, this includes Windows 10). Better use them with win32 or NT APIs.
+
+### Windows does provide file descriptors, and file descriptors on Windows are not win32 HANDLE
+
+I have heard many people say windows do not provide file descriptors, which is untrue. The windows CRT implements file descriptors with win32 HANDLE.
+
+See the API: ```_open_osfhandle```
+https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/open-osfhandle?view=msvc-170
+
+### Do not use ```std::unique_ptr``` for win32 ```HANDLE```
+
+People love to abuse C++ smart pointers, nowadays.
+```cpp
+/*BAD!!!
+Watch the video:
+https://youtu.be/5vGWM9DLrko?t=1205
+*/
+
+std::unique_ptr<HANDLE,std::function<decltype(CloseHandle)>> pHandle(hEvent,CloseHandle);
+
+```
+
+Just do not be lazy. Please. Write an RAII class that wraps void*.
+
+```cpp
+//Good! Just write a class
+win32_file file(u8"a.txt");
+```
 
 ## Todo: OTHER ISSUES
