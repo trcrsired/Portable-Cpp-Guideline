@@ -203,3 +203,96 @@ operator new (std::size_t sz, const std::nothrow_t&) noexcept
 ```
 
 We can see C++ standard library implements nothrow version's operator new with thrown version's new. It is completely useless.
+
+
+### The default implementation of the heap may be unavailable.
+
+In short, you cannot assume there is a default heap that is available.
+
+Reasons:
+1. There is simply no heap. (I know you would argue you can always provide one, but the reality is harsh, my friend.)
+2. Many heaps are available. This situation usually happens within operating system kernels (and even win32 applications with the abi compatibility issue between msvcrt and universal crt) where they provide multiple heaps. Making any of the defaults may be very wrong. For example, the Windows kernel provides different heaps; one is interrupt-safe while space is limited, but the others are not but space is space.
+3. C++ does not provide a thread-local implementation of the heap. The default heap might be highly inefficient. (Of course, thread-local storage might not be available, but that is a separate issue.)
+
+We can see forcing a default heap implementation never works out for a portable codebase. Just avoid new.
+
+### Avoid handling stack or heap allocation failure.
+
+One design failure with C and C++ is that stack exhaustion is undefined behavior while heap exhaustion is not. That creates inconsistency and a lot of issues.
+
+#### There is no way that you can always handle heap allocation failure to avoid crashing.
+
+1. Destructors can allocate memory again. That creates a vicious cycle and nobody knows what could happen.
+2. The implementation of GCC libsupc++ uses an emergency heap. However, implementing an emergency would still call ```std::terminate``` in many situations. So you can still get crashing even if it has an "emergency heap." I made the operator a new crash for allocation failure, removed the emergency heap from the libsupc++, and found no issues. No ABI issues. Nothing.
+3. Many libraries beneath you, including Glibc, would call xmalloc, which will still crash for malloc failure. You cannot avoid the issue unless you control all your source code.
+4. Operating Systems like Linux would overcommit and kill your process if you hit allocation failures. In general, programming languages like C++ cannot just handle allocation failures in any meaningful way, neither stack nor heap.
+
+
+### If you want to load large files, consider memory mapping API.
+
+I know you will try to make an argument that you want to load large files like image to memory for example. I am sorry, you are usually doing the wrong thing. Instead, you should use fstat(2) or Linux's statx syscall + memory mapping. 
+
+#### Advantages
+1. Memory mapping avoids the issue of file size overflow on 32 bits machine.
+2. It avoids messing up the CRT heap and never triggers allocation failure from malloc or new.
+3. It avoids copying the content from kernel space to user space, compared to loading the entire file to 
+4. Memory mapping allows file sharing among different processes, saving your physical memory.
+5. fseek(3) or seek(2) to load file may create more TOCTOU security vulnerabilities.
+6. The overcommit is less likely if you do not write to the copy-on-write pages.
+7. Memory mapping creates ```std::contiguous_range``` which is extremely useful for many workflows.
+
+```cpp
+/*
+BAD. fseek(3) and fread(3) to load file
+https://stackoverflow.com/questions/174531/how-to-read-the-content-of-a-file-to-a-string-in-c
+*/
+
+char * buffer = 0;
+long length;
+FILE * f = fopen (filename, "rb");
+
+if (f)
+{
+  fseek (f, 0, SEEK_END);
+  length = ftell (f);
+  fseek (f, 0, SEEK_SET);
+  buffer = malloc (length);
+  if (buffer)
+  {
+    fread (buffer, 1, length, f);
+  }
+  fclose (f);
+}
+
+if (buffer)
+{
+  // start to process your data / extract strings here...
+}
+
+```
+
+Libraries like ```fast_io``` provide direct support for file loading and handling all the corner cases for you, including transparent support for platforms that do not offer memory mapping (like web assembly).
+
+https://github.com/cppfastio/fast_io
+
+```cpp
+/*
+Good! native_file_loader with memory mapping
+https://github.com/cppfastio/fast_io/blob/master/examples/0006.file_io/file_loader.cc
+*/
+#include<fast_io.h>
+
+int main()
+{
+	fast_io::native_file_loader loader(u8"a.txt");
+	//This will load entire a.txt to memory through memory mapping.
+	/*
+	This is a contiguous range of the file.
+	You can do these things:
+	std::size_t sum{};
+	for(auto e:loader)
+		sum+=e;	
+	*/
+}
+```
+
