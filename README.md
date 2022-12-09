@@ -409,7 +409,6 @@ Different operating system and toolchains would provide different implementation
 You can check that by the reading source of all of them. That is another why you should not use ```iostream``` since why would you use it when it just wraps ```stdio```?
 
 GCC libstdc++:
-
 [https://github.com/llvm/llvm-project/blob/main/libcxx/include/fstream#L284](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/std/fstream#L113)
 
 LLVM libcxx:
@@ -420,7 +419,7 @@ https://github.com/microsoft/STL/blob/main/stl/inc/fstream#L781
 
 ### Prefer stdio over iostream if you cannot use a third-party library.
 
-iostream bloats binary size due to its object-oriented design. Usually, toolchain vendors need to optimize iostream for embedded systems. A typical iostream implementation costs 1MB of binary size. Also, ```iostream``` needs to include all ```stdio``` code, so please just no iostream.
+iostream bloats binary size due to its object-oriented design. Toolchain vendors never optimize iostream for embedded systems. A typical iostream implementation costs 1MB of binary size. Also, ```iostream``` needs to include all ```stdio``` code, so please just no iostream.
 
 ### Do not use C++17 ```std::filesystem```
 
