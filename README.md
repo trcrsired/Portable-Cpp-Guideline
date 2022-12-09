@@ -451,6 +451,7 @@ C++17 filesystem are just bad apis. Never use it.
 4. It is very slow. Most of the implementation would make this call a DLL indirect call, even if you are doing a trivial task like this. I have seen on platforms like windows that using it would cause a performance downgrade of 100x.
 5. It is not constexpr nor noexcept. This API is BAD.
 6. It is not generic and it only works for char. It does not work for char16_t for example.
+7. The header is not freestanding. You cannot use them.
 ```cpp
 char ch{};
 if(isupper(ch))//BAD
@@ -462,7 +463,10 @@ template<std::integral char_type>
 inline constexpr bool myisupper(char_type ch) noexcept
 {
 	return u8'A'<=ch&&ch<=u8'Z';//simple and naive implementation
-//Ok for ascii based execution charset. Need to do more work for ebcdic and big endian wchar_t. We ignore those cases here if you do not use them. They should not matter for 99.999999% of code.
+// Ok for ascii based execution charset.
+// Need to do more work for ebcdic and big endian wchar_t.
+// We ignore those cases here if you do not use them.
+// They should not matter for 99.999999% of code.
 }
 
 char ch{};
@@ -470,7 +474,7 @@ if(myisupper(ch))//Mostly ok
 	puts("Do something\n");
 ```
 
-```fast_io``` library provides them and they work even for wchar_t BE and EBCDIC execution charset
+```fast_io``` library provides them and they work even for wchar_t BE and EBCDIC execution charset. It is also freestanding
 ```cpp
 char ch{};
 if(fast_io::char_category::is_c_upper(ch))//ok
