@@ -451,13 +451,13 @@ C++17 filesystem are just bad apis. Never use it.
 4. It is very slow. Most of the implementation would make this call a DLL indirect call, even if you are doing a trivial task like this. I have seen on platforms like windows that using it would cause a performance downgrade of 100x.
 5. It is not constexpr nor noexcept. This API is BAD.
 6. It is not generic and it only works for char. It does not work for char16_t for example.
-```
+```cpp
 char ch{};
 if(isupper(ch))//BAD
 	puts("Do something\n");
 ```
 
-```
+```cpp
 template<std::integral char_type>
 inline constexpr bool myisupper(char_type ch) noexcept
 {
@@ -471,7 +471,7 @@ if(myisupper(ch))//Mostly ok
 ```
 
 ```fast_io``` library provides them and they work even for wchar_t BE and EBCDIC execution charset
-```
+```cpp
 char ch{};
 if(fast_io::char_category::is_c_upper(ch))//ok
 	print("Do something\n");
