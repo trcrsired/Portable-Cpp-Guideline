@@ -546,6 +546,14 @@ constexpr float Q_rsqrt(float number) noexcept
 }
 ```
 
+### Prevent GCC and clang's vector extension over ```<immintrin.h>``` when you need SIMD
+
+vector extensions are more fundamental and more flexible. They work on a lot of platforms, including wasm.
+
+https://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html
+
+Things like ```_m128``` are implemented with vector extensions on GCC and clang. As a result, there is no point to use them.
+
 ## Todo: Threads
 
 Do not use them unless you guard against the platform you are using exactly.
