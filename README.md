@@ -424,7 +424,7 @@ iostream bloats binary size due to its object-oriented design. Usually, toolchai
 
 ### Do not use C++17 ```std::filesystem```
 
-```std::filesystem``` is not thread-safe since it is locale-aware. More importantly, the design of ```std::filesystem``` is very outdated. It does not even match the criteria of POSIX 2008. No ```at()``` methods are available for ```std::filsystem``` and you always suffer from [TOCTOU](https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use) security vulnerabilities.
+```std::filesystem``` is not thread-safe since it is locale-aware. More importantly, the design of ```std::filesystem``` is very outdated. It does not even match the criteria of POSIX 2008. No ```at()``` methods are available for ```std::filesystem``` and you always suffer from [TOCTOU](https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use) security vulnerabilities.
 
 Also, it is very bloat due its locale usage. It would usually bloat 1MB.
 
