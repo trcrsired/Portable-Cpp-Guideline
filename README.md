@@ -140,6 +140,8 @@ x86_64-elf-g++ -c carray.cc -O3 -std=c++23 -s -flto
 */
 ```
 
+Update:
+std::array is NOT freestanding in C++23. It may be freestanding in future C++ standards.
 
 ### Avoid all C++ containers, iterators, algorithms, allocators
 
@@ -165,9 +167,12 @@ compilation terminated.
 */
 ```
 
-### Avoid ```<ranges>``` and ```<iterator>```
+### Avoid ```<ranges>``` and ```<iterator>``` before C++23
 
 You may want to use concepts like ```std::random_access_range```, ```std::contiguous_range```. Unfortunately, they are not freestanding either. A suggestion is that you should keep your design simple and stick to pointers as much as possible.
+
+Update:
+```<ranges>``` and ```<iterator>``` are partial freestanding since C++23. Everything can be used besides stream iterator things.
 
 ## Heap
 
@@ -337,7 +342,71 @@ http://harmful.cat-v.org/software/c++/linus
 ### In general, C++ Exceptions are just horrible. Herb Sutter's P0709R0 is our only hope.
 Watch video: https://www.youtube.com/watch?v=ARYP83yNAWk
 
-## Todo: IO
+## IO
+
+In short. Do not use iostream and stdio. If you have to use iostream and stdio, read this section to understand the pitfalls.
+
+### stdio and iostream are NOT freestanding.
+
+That is an issue even with toolchain vendors. LLVM libcxx cannot build without stdio, which breaks bootstrapping. Just do not use them.
+
+### stdio and iostream do not provide the same input and output due to locale.
+
+Locale can randomly change the behavior of stdio and iostream. That means a program that would work on one machine may not work on another machine.
+
+### stdio and iostream are not thread-safe.
+
+Locale affects stdio and iostream. Users might change locale at runtime, and that would cause thread-safety issues.
+
+iostream does not have any thread awareness. It does not lock the stream. Different threads would screw up any C++ stream randomly.
+
+### Using ```printf``` family functions incorrectly are always severe security vulnerabilities.
+
+Usage of ```print``` printf functions must be cautious.
+
+```cpp
+inline void foo(std::string const& str)
+{
+//DANGER! format string vulnerability
+	printf(str.c_str());
+//DANGER ignore the return value of printf or scanf
+}
+```
+
+### Never use ```std::endl```
+
+It is completely redundant. The tie mechanism of stream knows when to flush when deal with input and does the right thing automatically.
+
+Even you just want to flush the stream, you still have tons of other options. One is to manually flush the buffered stream. If you want to flush out every time, you probably need unbuffered stream. Unfortunately C++ stream does not provide enough support with unbuffered stream and that is why you need ```fast_io```
+
+### Never assume int8_t or int_least8_t or int_fast8_t to be either integers or characters.
+
+```cpp
+int8_t *p{};
+std::cout<<p; // DANGER! iostream overloads treats p as char* and this will treat p as a string.
+```
+
+Unfortunately, random pitfalls like that are everywhere for iostream.
+
+### Use memory mapping for loading large files. Not ```seek``` + ```read``` combos.
+
+### Prefer ```fast_io``` over stdio and iostream
+
+```fast_io``` library does not have all the issues we discussed before and provides tons of features stdio and iostream do not provide. However, it also offers deep understanding and hacking of stdio and iostream so that fast_io would expose more internal details for stdio and iostream.
+
+More importantly, ```fast_io``` is usually 10x or even 100x faster than stdio and iostream due to little redundant work to do compared to stdio and iostream.
+
+### Do not assume ```write(2)``` or ```read(2)``` would do "real IO"
+
+Most of the time, the operating system kernel would cache files into memory so that users would read/write files very fast instead of blocking the process. That means syscalls like ```write(2)``` or ```read(2)``` do the job something like memcpy for most of their time. The data will flush out to disk regularly. That is why most of time, io does not take too much time but most of time would waste on overhead for the abstractions of iostream and stdio.
+
+### Do not assume stdio and iostream have the same relative performance on different platforms.
+
+Different operating system and toolchains would provide different implementations of iostream and stdio. The performance gap between different platforms are huge. However, none of them could match the performance of fast_io in any way.
+
+### Prefer stdio over iostream if you cannot use a third-party library.
+
+iostream bloats binary size due to its object-oriented design. Usually, toolchain vendors need to optimize iostream for embedded systems. A typical iostream implementation costs 1MB of binary size.
 
 ## Todo: Integers
 
