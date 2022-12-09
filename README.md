@@ -20,7 +20,7 @@ You can have a try on this x86_64-elf-gcc compiler to ensure your code work in f
 
 https://github.com/trcrsired/windows-hosted-x86_64-elf-toolchains
 
-### Avoid ```std::addressof``` and ```operator &```
+### Avoid ```std::addressof``` and ```operator &``` before C++23
 
 C++ allows overloading operator &, which is a historical mistake. ISO C++ 11 standard introduces std::addressof that would fix the issue. C++17 allows std::addressof to be constexpr Unfortunately, ```std::addressof``` is in ```<memory>``` header, which is not freestanding. The std::addressof is impossible to implement in C++ without compiler magic.
 
@@ -65,7 +65,11 @@ Compilation success
 */
 ```
 
-### Avoid ```std::move```, ```std::forward``` and ```std::move_if_noexcept```
+Update:
+
+C++23 finally adds ```<memory>``` as partial freestanding header and ```std::addressof``` is now freestanding. However you need to ensure you use latest compilers that support C++23.
+
+### Avoid ```std::move```, ```std::forward``` and ```std::move_if_noexcept``` Before C++23
 
 ```std::move```, ```std::forward``` and ```std::move_if_noexcept``` are in ```<utility>``` header, which are not freestanding.
 
@@ -90,6 +94,10 @@ move.cc:1:9: fatal error: utility: No such file or directory
 compilation terminated.
 */
 ```
+
+Update:
+
+C++23 finally adds ```<utility>``` as freestanding header and ```std::move```, ```std::forward``` and ```std::move_if_noexcept``` are now freestanding. However, you need to ensure you use latest compilers that support C++23.
 
 ### Avoid ```std::array```
 
@@ -620,6 +628,11 @@ GCC for windows targets have three different threading ABIs. win32, posix and mc
 ```cpp
 //BAD!!
 #include<mutex>
+```
+
+```c
+//BAD!!
+#include<threads.h>
 ```
 
 ### Avoid ```thread_local``` and ```_Thread``` for cpu-windows-gnu clang targets
