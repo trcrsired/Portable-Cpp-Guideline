@@ -422,6 +422,25 @@ https://github.com/microsoft/STL/blob/main/stl/inc/fstream#L781
 
 iostream bloats binary size due to its object-oriented design. Usually, toolchain vendors need to optimize iostream for embedded systems. A typical iostream implementation costs 1MB of binary size. Also, ```iostream``` needs to include all ```stdio``` code, so please just no iostream.
 
+### Do not use C++17 ```std::filesystem```
+
+```std::filesystem``` is not thread-safe since it is locale-aware. More importantly, the design of ```std::filesystem``` is very outdated. It does not even match the criteria of POSIX 2008. No ```at()``` methods are available for ```std::filsystem``` and you always suffer from [https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use](TOCTOU) security vulnerabilities.
+
+Also, it is very bloat due its locale usage. It would usually bloat 1MB.
+
+As Herb Sutter pointed out in P0709, ```std::filesystem``` creates dual error reporting issues.
+
+```cpp
+//https://en.cppreference.com/w/cpp/filesystem/copy_file
+bool copy_file( const std::filesystem::path& from,
+                const std::filesystem::path& to );// Return bool but this api always returns true
+bool copy_file( const std::filesystem::path& from,
+                const std::filesystem::path& to,
+                std::error_code& ec ); // NOTICE!!! NOT NOEXCEPT
+```
+
+C++17 filesystem are just bad apis. Never use it.
+
 ## Todo: Integers
 
 ### ```::std::size_t``` should be your default integer types. Not ```int```.
