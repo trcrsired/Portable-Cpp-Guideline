@@ -834,6 +834,9 @@ See also:
 
 https://devblogs.microsoft.com/oldnewthing/20200521-00/?p=103777
 
-## If you want portablity, build as many GCC cross/canadian toolchains as possible.
+### If you want portablity, build as many GCC cross/canadian toolchains as possible.
 
 Building more toolchains gives you room for testing your code on different platforms. That would strictly force you on the behavior you are doing. It also guarantees portability since you test your code on different platforms.
+
+
+### Do not use ```std::unique_ptr```
