@@ -485,7 +485,7 @@ if(fast_io::char_category::is_c_upper(ch))//ok
 
 C++ standard never said how large ```sizeof(int)``` is. They have caused a lot of troubles.
 
-```
+```cpp
 //HORRIBLE!!! This is undefined-behavior if vec.size() is larger than INT_MAX.
 for(int i{};i!=vec.size();++i)
 {
