@@ -441,6 +441,44 @@ bool copy_file( const std::filesystem::path& from,
 
 C++17 filesystem are just bad apis. Never use it.
 
+### Avoid any feature that uses locale internally. Particularly ```<cctype>```
+
+```<cctype>``` is a very horrible header. It is slow and not thread-safe. It also creates undefined behavior randomly. Most C++ books would recommend you for using things like ```isupper(3)``` to detect whether a character is uppercase or not. This is a horrible recommendation.
+
+1. For isupper(ch), the function assumes ch is in the range [0,127]. That means you can randomly trigger undefined behavior if you do not do the checks before.
+2. the function is locale-aware. Locale is not thread-safe. You will screw it up.
+3. Due to its locale usage, it does not answer deterministically.
+4. It is very slow. Most of the implementation would make this call a DLL indirect call, even if you are doing a trivial task like this. I have seen on platforms like windows that using it would cause a performance downgrade of 100x.
+5. It is not constexpr nor noexcept. This API is BAD.
+6. It is not generic and it only works for char. It does not work for char16_t for example.
+```
+char ch{};
+if(isupper(ch))//BAD
+	puts("Do something\n");
+```
+
+```
+template<std::integral char_type>
+inline constexpr bool myisupper(char_type ch) noexcept
+{
+	return u8'A'<=ch&&ch<=u8'Z';//simple and naive implementation
+//Ok for ascii based execution charset. Need to do more work for ebcdic and big endian wchar_t. We ignore those cases here if you do not use them. They should not matter for 99.999999% of code.
+}
+
+char ch{};
+if(myisupper(ch))//Mostly ok
+	puts("Do something\n");
+```
+
+```fast_io``` library provides them and they work even for wchar_t BE and EBCDIC execution charset
+```
+char ch{};
+if(fast_io::char_category::is_c_upper(ch))//ok
+	print("Do something\n");
+```
+
+
+
 ## Todo: Integers
 
 ### ```::std::size_t``` should be your default integer types. Not ```int```.
