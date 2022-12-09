@@ -404,9 +404,23 @@ Most of the time, the operating system kernel would cache files into memory so t
 
 Different operating system and toolchains would provide different implementations of iostream and stdio. The performance gap between different platforms are huge. However, none of them could match the performance of fast_io in any way.
 
+### ```<iostream>``` is implemented with ```<stdio.h>``` for all implementations. (libstdc++, libcxx and msvc stl)
+
+You can check that by the reading source of all of them. That is another why you should not use ```iostream``` since why would you use it when it just wraps ```stdio```?
+
+GCC libstdc++:
+
+[https://github.com/llvm/llvm-project/blob/main/libcxx/include/fstream#L284](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/std/fstream#L113)
+
+LLVM libcxx:
+[https://github.com/llvm/llvm-project/blob/main/libcxx/include/fstream#L284](https://github.com/llvm/llvm-project/blob/main/libcxx/include/fstream#L284)
+
+MSVC STL:
+https://github.com/microsoft/STL/blob/main/stl/inc/fstream#L781
+
 ### Prefer stdio over iostream if you cannot use a third-party library.
 
-iostream bloats binary size due to its object-oriented design. Usually, toolchain vendors need to optimize iostream for embedded systems. A typical iostream implementation costs 1MB of binary size.
+iostream bloats binary size due to its object-oriented design. Usually, toolchain vendors need to optimize iostream for embedded systems. A typical iostream implementation costs 1MB of binary size. Also, ```iostream``` needs to include all ```stdio``` code, so please just no iostream.
 
 ## Todo: Integers
 
