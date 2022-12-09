@@ -818,7 +818,7 @@ Running Windows applications on Linux with WINE has substantial benefits in avoi
 
 Remember to export the WINEPATH environment in $HOME/.bashrc to include C++ standard libraries DLLs like libstdc++-6.dll.
 
-## Todo: OTHER ISSUES
+## OTHER ISSUES
 
 ### inline means to prevent ODR violation. Not for hints or expansions.
 
@@ -833,3 +833,7 @@ https://www.youtube.com/watch?v=6WjKIStrc80
 See also:
 
 https://devblogs.microsoft.com/oldnewthing/20200521-00/?p=103777
+
+## If you want portablity, build as many GCC cross/canadian toolchains as possible.
+
+Building more toolchains gives you room for testing your code on different platforms. That would strictly force you on the behavior you are doing. It also guarantees portability since you test your code on different platforms.
