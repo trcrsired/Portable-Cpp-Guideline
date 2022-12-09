@@ -433,6 +433,13 @@ int8_t i{},*p{__builtin_addressof(i)};
 std::cout<<p;//DANGER!!!
 std::cout<<std::format("{}\n",p);//DANGER!!!
 ```
+### Be cautious of the endianness of ```wchar_t```
+
+It might be surprising that the endianness of ```wchar_t``` may not be the same as the endianness of your native endian.
+
+For example, the execution encoding of ```wchar_t``` may be UTF32BE, but your machine's endianness is little. That means any options you do for ```wchar_t``` need to swap its endianness before doing anything.
+
+Other character types, including ```char16_t``` and ```char32_t``` do not have this issue. Their endianness are always the same as your machine's endiannness.
 
 ### Prefer integer types in ```<cstdint>``` than basic integer types
 
@@ -716,7 +723,6 @@ They are three different ABIs, and iostream will break if you link to the wrong 
 
 Running Windows applications on Linux with WINE has substantial benefits in avoiding issues like ABIs.
 
-Do not forget to export WINEPATH environment in $HOME/.bashrc to include C++ standard libraries dlls like libstdc++-6.dll.
-
+Remember to export the WINEPATH environment in $HOME/.bashrc to include C++ standard libraries DLLs like libstdc++-6.dll.
 
 ## Todo: OTHER ISSUES
