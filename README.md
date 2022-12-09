@@ -362,7 +362,7 @@ iostream does not have any thread awareness. It does not lock the stream. Differ
 
 ### Using ```printf``` family functions incorrectly are always severe security vulnerabilities.
 
-Usage of ```print``` printf functions must be cautious.
+Usage of ```printf``` functions must be cautious.
 
 ```cpp
 inline void foo(std::string const& str)
@@ -726,3 +726,17 @@ Running Windows applications on Linux with WINE has substantial benefits in avoi
 Remember to export the WINEPATH environment in $HOME/.bashrc to include C++ standard libraries DLLs like libstdc++-6.dll.
 
 ## Todo: OTHER ISSUES
+
+### inline means to prevent ODR violation. Not for hints or expansions.
+
+The keyword is very confusing in C++. It also has different meanings than C.
+
+If you define a function with the same signature in multiple translation units, the linker will complain and won't link. When a function is marked as inline, the linker is free to discard any functions with the same signature and keeps only one copy, assuming these functions work the same. If they do not work the same, that is undefined behavior.
+
+Also, when the function is defined as inline, GCC and clang won't emit functions unless used, which is very important for preventing dead code.
+
+Watch video if you want to understand ```inline```.
+https://www.youtube.com/watch?v=6WjKIStrc80
+See also:
+
+https://devblogs.microsoft.com/oldnewthing/20200521-00/?p=103777
