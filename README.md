@@ -440,6 +440,10 @@ bool copy_file( const std::filesystem::path& from,
 
 C++17 filesystem are just bad apis. Never use it.
 
+### Do not use ```<charconv>```
+
+### Do not use ```<format>```
+
 ### Avoid any feature that uses locale internally. Particularly ```<cctype>```
 
 ```<cctype>``` is a very horrible header. It is slow and not thread-safe. It also creates undefined behavior randomly. Most C++ books would recommend you for using things like ```isupper(3)``` to detect whether a character is uppercase or not. This is a horrible recommendation.
