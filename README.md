@@ -408,14 +408,11 @@ Different operating system and toolchains would provide different implementation
 
 You can check that by the reading source of all of them. That is another why you should not use ```iostream``` since why would you use it when it just wraps ```stdio```?
 
-GCC libstdc++:
-[https://github.com/llvm/llvm-project/blob/main/libcxx/include/fstream#L284](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/std/fstream#L113)
+[GCC libstdc++](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/std/fstream#L113)
 
-LLVM libcxx:
-[https://github.com/llvm/llvm-project/blob/main/libcxx/include/fstream#L284](https://github.com/llvm/llvm-project/blob/main/libcxx/include/fstream#L284)
+[LLVM libcxx](https://github.com/llvm/llvm-project/blob/main/libcxx/include/fstream#L284)
 
-MSVC STL:
-https://github.com/microsoft/STL/blob/main/stl/inc/fstream#L781
+[MSVC STL](https://github.com/microsoft/STL/blob/main/stl/inc/fstream#L781)
 
 ### Prefer stdio over iostream if you cannot use a third-party library.
 
