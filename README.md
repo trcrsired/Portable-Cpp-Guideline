@@ -521,9 +521,13 @@ Other character types, including ```char16_t``` and ```char32_t``` do not have t
 They have the same issue with int. C++ standard never said how large sizeof(T) for short, int, long and long long.
 
 
-### Prefer ```::std::uint_leastxx_t``` over ```::std::uintxx_t```
+### Prefer ```::std::(u)int_leastxx_t``` over ```::std::(u)intxx_t```
 
-Types like ::std::uintxx_t are optional and may not exist. They happen when a single byte in some architectures is not 8 bits which might save a lot of money for specific embedded systems. For maximumly portable code, just use ```::std::uint_leastxx_t```
+Types like ```::std::(u)intxx_t``` are optional and may not exist. They happen when a single byte in some architectures is not 8 bits which might save a lot of money for specific embedded systems. For maximumly portable code, just use ```::std::(u)int_leastxx_t```
+
+### Using ```INTXX_C()``` and ```UINTXX_C()``` macros to define consts for ```::std::(u)int_leastxx_t```.
+
+C and C++ standard provides this header that makes our life much easier when dealing with ```::std::(u)int_leastxx_t```. Despite the name indicates they are for ```::std::(u)intxx_t```, actually they refer to define consts for ```::std::(u)int_leastxx_t```, which is quite interesting. ```INT_LEASTXX_C()``` does not exist.
 
 ### Avoid __uint128_t for GCC and clang
 
