@@ -483,7 +483,7 @@ if(fast_io::char_category::is_c_upper(ch))//ok
 
 
 
-## Todo: Integers
+## Integers
 
 ### ```::std::size_t``` should be your default integer types. Not ```int```.
 
