@@ -156,10 +156,9 @@ compilation terminated.
 
 ### Avoid ```<ranges>``` and ```<iterator>``` before C++23
 
-You may want to use concepts like ```std::random_access_range```, ```std::contiguous_range```. Unfortunately, they are not freestanding either. A suggestion is that you should keep your design simple and stick to pointers as much as possible.
+Avoid using the ```<ranges>``` and ```<iterator>``` headers in C++ versions prior to C++23. While concepts such as ```std::random_access_range``` and ```std::contiguous_range``` may be useful, they are not freestanding and may not be available in all contexts. It is often simpler to stick with using pointers instead.
 
-Update:
-```<ranges>``` and ```<iterator>``` are partial freestanding since C++23. Everything can be used besides stream iterator things.
+Starting with C++23, ```<ranges>``` and ```<iterator>``` are partially freestanding, meaning that they can be used in most contexts except for stream iterator-related functionality.
 
 ## Heap
 
