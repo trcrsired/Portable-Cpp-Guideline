@@ -638,7 +638,6 @@ In general, you should think about things like CYGWIN/MSYS2 exist. wine-gcc will
 ### Do not ```#include<windows.h>``` in public headers
 
 Reasons:
-Avoid including <windows.h> in public headers for the following reasons:
 
 1. Libraries like Boost may include the header as <Windows.h>, causing issues for cross-compilation since UNIX filesystems are case-sensitive. This can lead to compiler errors when GCC or clang fails to find the header.
 2. Windows APIs are not correctly marked as noexcept.
