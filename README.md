@@ -1,24 +1,20 @@
 # Portable C++ Guideline
 
-Have you ever tried to make your C++ code maximumly portable and efficient? Here is a guideline that helps your write portable and efficient C++ code.
+Are you interested in writing portable and efficient C++ code? Look no further than this guideline! Unlike other guidelines, such as the C++ Core Guideline, our guidelines prioritize portability and avoid problematic coding practices.
 
-You may ask why I created this guideline? The reason is that guidelines like C++ Core Guideline usually teach unportable and problematic coding practices that only promote the portability trap.
+It's important to remember that there's no such thing as a zero-cost or zero-overhead (runtime) abstraction. Beware of anyone who claims otherwise! Even features like borrow checkers and C++ exceptions have runtime overhead (see here: https://blog.polybdenum.com/2021/08/09/when-zero-cost-abstractions-aren-t-zero-cost.html and here: https://devblogs.microsoft.com/oldnewthing/20220228-00/?p=106296).
 
-Remember, there is no zero-cost / zero-overhead (Runtime) abstraction. Anyone who tries to sell you those concepts is just falsely advertising. All abstractions have runtime overhead, including Borrow Checkers ( https://blog.polybdenum.com/2021/08/09/when-zero-cost-abstractions-aren-t-zero-cost.html ) and C++ exceptions ( https://devblogs.microsoft.com/oldnewthing/20220228-00/?p=106296 ).
-
-Current C++ standard is C++23.
+Note that the current C++ standard is C++23.
 
 ## Freestanding
 
-In general, Portable C++ code should stick to the freestanding C++ part and use platform macros to guard against the hosted environment.
+To write truly portable C++ code, it's important to stick to the freestanding C++ part and use platform macros to guard against the hosted environment. The C++ reference provides a useful guide on freestanding implementations and the functions available in this environment.
 
-https://en.cppreference.com/w/cpp/freestanding
 
-Unfortunately, many headers you may think should be available are not available, and those headers that are available may have issues preventing you from using them.
+However, it's important to note that many headers that you may assume should be available may not be present in a freestanding environment. Additionally, certain headers that are available may have limitations or issues that could prevent you from using them.
 
-You can have a try on this x86_64-elf-gcc compiler to ensure your code work in freestanding environment.
 
-https://github.com/trcrsired/windows-hosted-x86_64-elf-toolchains
+If you want to ensure that your code works in a freestanding environment, you can try using the x86_64-elf-gcc compiler. This compiler is available on the following GitHub repository: https://github.com/trcrsired/windows-hosted-x86_64-elf-toolchains
 
 ### Avoid ```std::addressof``` and ```operator &``` before C++23
 
