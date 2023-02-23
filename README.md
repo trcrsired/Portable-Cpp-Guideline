@@ -650,6 +650,17 @@ Herb Sutter's Metaclasses proposal aims to extend the C++ language with a new fe
 
 With metaclasses, it might become easier to use type erasure in C++ and, in turn, make OOP less necessary in certain situations. However, metaclasses are not yet part of the C++ standard, and their exact design and implementation may change in the future.
 
+## Memory Safety
+
+Ensuring code reliability and security is a critical aspect of software development. To achieve this, there are several important practices that developers should follow. Firstly, it is recommended to always run code with sanitizers. This is because sanitizers can detect a wide range of issues such as memory errors, undefined behavior, data races, and more.
+
+Another important practice is fuzzing. Fuzzing involves generating random inputs to a program and monitoring for unexpected behaviors or crashes. This can help uncover bugs or security vulnerabilities that may not be immediately apparent during development.
+
+In terms of efficient bounds checking, it is recommended to use macros like ```_GLIBCXX_ASSERTIONS``` instead of the ```at()``` method for performing bounds checking on the entire C++ standard library. This can significantly improve performance and reduce overhead. See: [How to make "modern" C++ programs safer
+](https://www.youtube.com/watch?v=FAt8KVlNB7E)
+
+Finally, memory tagging is a powerful tool for defending against memory safety bugs. By adding tags to memory allocations, developers can detect buffer overflows, use-after-free errors, and other common memory safety issues. This can help prevent exploits and improve overall program stability.
+
 ## Windows specific
 
 ### Guard Windows specific code with ```#if (defined(_WIN32) && !defined(__WINE__)) || defined(__CYGWIN__)```
