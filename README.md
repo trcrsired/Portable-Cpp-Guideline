@@ -862,4 +862,5 @@ This will help you identify potential issues early on and allow you to develop a
 10. Implementing data structures with ```std::unique_ptr``` is always incorrect and may cause stack overflow.
 11. While ```std::unique_ptr``` is partially freestanding in C++23, it is not useful since ```std::make_unique``` is not freestanding and ```new``` is not guaranteed to be available.
 12. Most importantly, ```std::unique_ptr<T>``` lacks type richness, making it unclear what ```std::unique_ptr<shape>``` signifies. Writing ```T``` instead of ```std::unique_ptr<T>``` would provide more clarity and meaning.
+
 In general, ```std::unique_ptr``` is not a smart pointer but rather a questionable pointer type that can be harmful.
