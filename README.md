@@ -16,7 +16,7 @@ However, it's important to note that many headers that you may assume should be 
 
 If you want to ensure that your code works in a freestanding environment, you can try using the x86_64-elf-gcc compiler. This compiler is available on the following GitHub repository: https://github.com/trcrsired/windows-hosted-x86_64-elf-toolchains
 
-### Avoid ```std::addressof``` and ```operator &``` before C++23
+### Avoid using ```std::addressof``` before C++23 and the ```operator &``` all the time
 
 This is because C++ allows ```operator &``` to be overloaded, which is a mistake from a historical perspective. To address this issue, the ISO C++ 11 standard introduced ```std::addressof```. However, in C++17, ```std::addressof``` was made constexpr. Unfortunately, ```std::addressof``` is part of the ```<memory>``` header, which is not freestanding. As a result, implementing ```std::addressof``` in C++ without compiler magic is impossible.
 
