@@ -838,9 +838,9 @@ Windows targets in GCC support three different threading ABIs, including win32, 
 
 ## OTHER ISSUES
 
-### The Purpose of Inline in C++: Preventing ODR Violations, Not for Hints or Expansions.
+### The Purpose of ```inline``` in C++: Preventing ODR Violations, Not for Hints or Expansions.
 
-The purpose of the inline keyword in C++ is to prevent ODR (One Definition Rule) violations, not for providing hints or expansions. However, the keyword's usage is often confusing due to its different meanings compared to C. If a function with the same signature is defined in multiple translation units, the linker will fail to link them. When a function is marked as inline, the linker can discard any functions with the same signature and keep only one copy, assuming they work the same. However, if they don't work the same, it results in undefined behavior. Additionally, marking a function as inline allows GCC and clang to avoid emitting the function unless it's used, which is important for preventing dead code. For a better understanding of inline, watch the video at https://www.youtube.com/watch?v=6WjKIStrc80 and refer to this article https://devblogs.microsoft.com/oldnewthing/20200521-00/?p=103777.
+The purpose of the ```inline``` keyword in C++ is to prevent ODR (One Definition Rule) violations, not for providing hints or expansions. However, the keyword's usage is often confusing due to its different meanings compared to C. If a function with the same signature is defined in multiple translation units, the linker will fail to link them. When a function is marked as inline, the linker can discard any functions with the same signature and keep only one copy, assuming they work the same. However, if they don't work the same, it results in undefined behavior. Additionally, marking a function as inline allows GCC and clang to avoid emitting the function unless it's used, which is important for preventing dead code. For a better understanding of inline, watch the video at https://www.youtube.com/watch?v=6WjKIStrc80 and refer to this article https://devblogs.microsoft.com/oldnewthing/20200521-00/?p=103777.
 
 ### To ensure maximum portability, it is recommended to build and test your code on as many GCC cross/canadian toolchains as possible.
 
