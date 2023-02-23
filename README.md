@@ -602,7 +602,7 @@ In general, using the vector extensions provided by GCC and Clang is a simpler a
 
 ## Todo: Threads
 
-Do not use them unless you guard against the platform you are using exactly.
+When working with threads, it's important to ensure that your code is platform-agnostic. This means that you should avoid making assumptions about the underlying platform and instead write code that is compatible with multiple platforms.
 
 ### Never use spin lock.
 
