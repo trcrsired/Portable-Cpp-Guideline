@@ -625,7 +625,14 @@ https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723
 
 ## Todo: OOP
 
-In short, do not use OOP. Use type-erasure instead. (Herb Sutter's Metaclasses might trivialize this a lot so that there would be no reasons for OOP in any circumanstances.)
+Consider using type-erasure instead of Object-Oriented Programming (OOP). Herb Sutter's Metaclasses can simplify the use of type-erasure and eliminate the need for OOP in most cases.
+
+	
+### Herb Sutter's Proposal about metaclasses
+
+Herb Sutter's Metaclasses proposal aims to extend the C++ language with a new feature that allows programmers to define custom language extensions, such as type erasure, in a more efficient and safer way. Metaclasses provide a way to generate code at compile-time based on user-defined specifications, without the need for macros or external tools.
+
+With metaclasses, it might become easier to use type erasure in C++ and, in turn, make OOP less necessary in certain situations. However, metaclasses are not yet part of the C++ standard, and their exact design and implementation may change in the future.
 
 ## Windows specific
 
