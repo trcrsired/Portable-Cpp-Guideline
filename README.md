@@ -162,7 +162,7 @@ Starting with C++23, ```<ranges>``` and ```<iterator>``` are partially freestand
 
 ## Heap
 
-Yes, I know ```<new>``` is freestanding. However, C++ standard does not design it to be truly useful. They throw exceptions very chaotically.
+While it is true that ```<new>``` is freestanding, it is not designed to be particularly useful in its current state. This is due to the fact that exceptions are thrown in a somewhat chaotic manner, making it difficult to rely on in certain contexts.
 
 ### Avoid ```std::nothrow```
 
