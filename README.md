@@ -496,13 +496,13 @@ In summary, it's best to use ```::std::size_t``` as the default integer type in 
 	
 
 ```cpp
-//HORRIBLE!!! This is undefined-behavior if vec.size() is larger than INT_MAX.
+//DANGER: This is potentially disastrous as it results in undefined behavior when vec.size() exceeds INT_MAX.
 for(int i{};i!=vec.size();++i)
 {
 }
 ```
 
-Exceptionals: APIs that use int. ```int main()``` for example.
+Exceptions: APIs that use ```int```, such as ```int main()```, for example.
 
 ### Avoid assuming that ```char```, ```wchar_t```, ```char8_t```, ```char16_t```, and ```char32_t``` are solely character types, as they are actually integer types.
 
