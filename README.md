@@ -524,7 +524,7 @@ It's recommended to use integer types in ```<cstdint>``` instead of basic intege
 
 It's best to use ```::std::(u)int_leastxx_t``` rather than ```::std::(u)intxx_t```, as the latter types are optional and may not exist. They are used when a single byte on certain architectures isn't 8 bits, which can save money for embedded systems. For maximum portability, always use ```::std::(u)int_leastxx_t```. It's also recommended to use the ```INTXX_C()``` and ```UINTXX_C()``` macros to define constants for ```::std::(u)int_leastxx_t```, as this makes working with these types much easier. It's worth noting that despite their names, these macros are used to define constants for ```::std::(u)int_leastxx_t```, not ```::std::(u)intxx_t```.
 
-### Avoid __uint128_t for GCC and clang
+### Avoid ```__uint128_t``` for GCC and clang
 
 These types only exist for 64-bit targets, and even then, they don't generate efficient code for compilers. It's better to unpack ```__uint128_t``` into two ```::std::uint_least64_t```.
 
