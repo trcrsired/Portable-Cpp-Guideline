@@ -444,7 +444,7 @@ Overall, C++17's std::filesystem is not a good API to use and should be avoided.
 
 ### Avoid any feature that uses locale internally, especially ```<cctype>``` header.
 
-It's highly recommended to avoid using any feature that uses locale internally, especially the <cctype> header.
+It's highly recommended to avoid using any feature that uses locale internally, especially the ```<cctype>``` header.
 
 The ```<cctype>``` header is notoriously problematic. It's slow, not thread-safe, and can create undefined behavior at random. Some C++ books suggest using functions like ```isupper(3)``` to check whether a character is uppercase, but this is a terrible recommendation for several reasons:
 
@@ -458,7 +458,7 @@ The ```<cctype>``` header is notoriously problematic. It's slow, not thread-safe
 
 In summary, it's best to avoid using the <cctype> header and other locale-dependent features to ensure better performance, thread safety, and determinism in your code.
 
-	```cpp
+```cpp
 char ch{};
 if(isupper(ch))//BAD
 	puts("Do something\n");
@@ -480,20 +480,24 @@ if(myisupper(ch))//Mostly ok
 	puts("Do something\n");
 ```
 
-```fast_io``` library provides them and they work even for wchar_t BE and EBCDIC execution charset. It is also freestanding
+The ```fast_io``` library offers functions that work with wchar_t with big endian, or even with execution charsets like EBCDIC. Moreover, the library is freestanding, making it a great choice for use in a wide variety of environments.
+	
 ```cpp
 char ch{};
 if(fast_io::char_category::is_c_upper(ch))//ok
 	print("Do something\n");
 ```
 
-
-
 ## Integers
 
-### ```::std::size_t``` should be your default integer types. Not ```int```.
+### Prefer ```::std::size_t``` over ```int``` as your default integer type.
 
-C++ standard never said how large ```sizeof(int)``` is. They have caused a lot of troubles.
+When choosing integer types, it's generally recommended to use ```::std::size_t``` as the default type rather than int. While int is a commonly used type, the C++ standard does not define how large ```sizeof(int)``` is, which can lead to issues.
+
+On the other hand, ```::std::size_t``` is defined by the C++ standard to be an unsigned integer type that is guaranteed to be able to represent the size of any object that can be allocated in memory. Using ```::std::size_t``` as the default type can help ensure portability and prevent unexpected errors due to integer overflow.
+
+In summary, it's best to use ```::std::size_t``` as the default integer type in your code to ensure better portability and prevent potential issues arising from undefined behavior.
+	
 
 ```cpp
 //HORRIBLE!!! This is undefined-behavior if vec.size() is larger than INT_MAX.
@@ -504,9 +508,9 @@ for(int i{};i!=vec.size();++i)
 
 Exceptionals: APIs that use int. ```int main()``` for example.
 
-### Do not assume ```char```, ```wchar_t```, ```char8_t```, ```char16_t``` and ```char32_t``` are character types. They are just integer types.
+### Avoid assuming that ```char```, ```wchar_t```, ```char8_t```, ```char16_t```, and ```char32_t``` are solely character types, as they are actually integer types.
 
-That assumptions randomly create undefined behavior. One notorious example is C++ iostream.
+Avoid assuming that ```char```, ```wchar_t```, ```char8_t```, ```char16_t```, and ```char32_t``` are character types. While they may seem like character types, they are actually integer types, and making assumptions otherwise can lead to undefined behavior. For example, the way C++ iostream handles these types can cause issues if you assume they are purely character types.
 
 ```cpp
 //libc might define int8_t as char
@@ -540,22 +544,20 @@ In the case of ```::std::uintmax_t``` and ```::std::intmax_t```, using these typ
 
 To avoid these issues and ensure compatibility, it's best to use fixed-size integer types like ```::std::(u)int_leastxx_t``` instead.
 
-## Floating Points
+### Floating Point Arithmetic
 
-Short answer: Do not assume floating points exist!!! Just do not use them in portable code.
+In portable code, it is best to avoid assuming the existence of floating point types. There are several reasons for this:
 
-### Floating points might use extra registers which kernel is not willing to save.
+1. Floating point registers might not be saved by the kernel, which could result in undefined behavior if they are used.
+2. Soft floating point implementations can be very slow on hardware that lacks floating point arithmetic support.
+3. The use of ```<cmath>``` APIs can lead to issues with ```math_errhandling```.
+4. If you need to treat floating point types as integers, use ```std::bit_cast``` instead of pointer tricks, which can violate the strict-aliasing rule.
 
-Kernels usually just ban the usage for floating points.
+The strict aliasing rule is a rule in the C and C++ programming languages that states that a pointer of one type cannot be dereferenced as a pointer of a different type. In other words, it is not allowed to access the same memory location through two different pointers with different types, except for a few specific cases defined by the standard.
 
-### Soft floating points are very slow on hardwares that could not provide floating points arithmatics
+The strict aliasing rule is important because it allows the compiler to make optimizations based on the assumption that pointers of different types do not refer to the same memory location. Violating the strict aliasing rule can result in undefined behavior, such as crashes, incorrect results, or other unexpected behavior.	
 
-### ```<cmath>``` APIs touch ```math_errhandling``` which cause a lot troubles
-
-### Use std::bit_cast for dealing with floating point types if you want treat them as integers.
-
-Pointer tricks would easily violate strict-aliasing rule. See
-https://gist.github.com/shafik/848ae25ee209f698763cffee272a58f8
+For more information on the strict-aliasing rule, see: https://gist.github.com/shafik/848ae25ee209f698763cffee272a58f8
 
 ```c
 //BAD
