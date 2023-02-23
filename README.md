@@ -225,7 +225,7 @@ In general, it's preferable to simply call ```std::abort``` if ```malloc(3)``` f
 
 1. Destructors can allocate memory again, creating a vicious cycle that can lead to unpredictable results.
 2. The GCC libsupc++ implementation uses an emergency heap, but even if you implement an emergency heap, it might still call ```std::terminate``` in many situations, leading to crashes. To verify this, I removed the emergency heap from the libsupc++ and found no issues, including no ABI issues.
-3. Many libraries beneath you, including Glibc, call xmalloc, which will still crash for malloc failure. You cannot avoid the issue unless you control all your source code.
+3. Many libraries beneath you, including glibc, call ```xmalloc```, which will still crash for ```malloc(3)``` failure. You cannot avoid the issue unless you control all your source code.
 4. Operating systems like Linux will overcommit and kill your process if you hit allocation failures. In general, programming languages like C++ cannot handle allocation failures in any meaningful way, whether on the stack or the heap.
 5. C++'s ```new``` operator throws exceptions, and C++ codebases usually allocate memory on the heap using new, creating invisible code paths and potential exception-safety bugs.
 
@@ -238,7 +238,7 @@ Loading large files, such as images, into memory may seem like a reasonable appr
 2. It avoids messing up the CRT heap and never triggers allocation failure from malloc or new.
 3. It avoids copying the content from kernel space to user space, compared to loading the entire file to a std::string.
 4. Memory mapping allows file sharing among different processes, saving your physical memory.
-5. fseek(3) or seek(2) to load a file may create more TOCTOU security vulnerabilities.
+5. ```fseek(3)``` or ```seek(2)``` to load a file may create more TOCTOU security vulnerabilities.
 6. The overcommit is less likely if you do not write to the copy-on-write pages.
 7. Memory mapping creates a std::contiguous_range, which is extremely useful for many workflows.
 8. You can write to memory-mapped memory without changing the file's content if you load the pages with private pages. However, writing content to the memory region will trigger a page fault, and the operating system kernel will allocate new pages for your process.
