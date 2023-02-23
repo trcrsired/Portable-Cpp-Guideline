@@ -847,4 +847,17 @@ The purpose of the ```inline``` keyword in C++ is to prevent ODR (One Definition
 This will help you identify potential issues early on and allow you to develop a more robust and portable codebase. By testing on various platforms, you can ensure that your code behaves consistently across different systems and architectures, thus minimizing the risk of unexpected behavior and errors.
 
 
-### Do not use ```std::unique_ptr```
+### Avoid using std::unique_ptr
+
+1. Overreliance on ```std::unique_ptr``` encourages overuse of OOP, perpetuating the same problems as before.
+2. While ```std::unique_ptr``` helps with memory leaks, it cannot fix issues like type-confusions or vptr-injection.
+3. Using ```std::unique_ptr``` to manage resources beyond memory is generally ineffective since APIs often do not support specific types like Unix file descriptors or SQLite3. Writing a class to wrap these resources is preferable to address all related issues, such as ignoring error codes.
+3. Compilation speeds may suffer due to the inclusion of the memory header.
+4. Overuse of nullptr may occur when relying on unique_ptr to represent empty states.
+5. The deleter of unique_ptr can lead to inefficiencies, and it is challenging to avoid unintended performance degradation, regardless of whether the deleter is a lambda, function pointer, or function object.
+6. Before using ```std::unique_ptr`` to make non-movable objects movable, it is important to question why the type is unmovable in the first place.
+7. For ```std::unique_ptr<T[]>```, the ```[]``` can be easily forgotten, leading to undefined behavior.
+8. Implementing data structures with ```std::unique_ptr``` is always incorrect and may cause stack overflow.
+9. While ```std::unique_ptr``` is partially freestanding in C++23, it is not useful since ```std::make_unique``` is not freestanding and ```new``` is not guaranteed to be available.
+10. Most importantly, ```std::unique_ptr<T>``` lacks type richness, making it unclear what ```std::unique_ptr<shape>``` signifies. Writing ```T``` instead of ```unique_ptr<T>``` would provide more clarity and meaning.
+In general, ```std::unique_ptr``` is not a smart pointer but rather a questionable pointer type that can be harmful.
