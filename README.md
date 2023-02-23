@@ -663,7 +663,7 @@ Finally, memory tagging is a powerful tool for defending against memory safety b
 
 It's recommended to include the following flags when compiling with GCC and Clang:
 
-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wunused -Wuninitialized -Wshadow -Wconversion
+-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wunused -Wuninitialized -Wshadow -Wconversion
 
 here is an extended explanation of each flag:
 
