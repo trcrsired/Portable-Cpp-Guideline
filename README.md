@@ -572,7 +572,8 @@ The strict aliasing rule is a rule in the C and C++ programming languages that s
 
 The strict aliasing rule is important because it allows the compiler to make optimizations based on the assumption that pointers of different types do not refer to the same memory location. Violating the strict aliasing rule can result in undefined behavior, such as crashes, incorrect results, or other unexpected behavior.	
 
-For more information on the strict-aliasing rule, see: https://gist.github.com/shafik/848ae25ee209f698763cffee272a58f8
+For more information on the strict-aliasing rule, see: [What is the Strict Aliasing Rule and Why do we care?
+](https://gist.github.com/shafik/848ae25ee209f698763cffee272a58f8)
 
 ```c
 //BAD
