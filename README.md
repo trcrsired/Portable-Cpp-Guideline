@@ -371,7 +371,7 @@ To avoid these issues, it's generally better to rely on the automatic flushing m
 
 If you want to print your output immediately without buffering, you can use unbuffered streams. However, the C++ stream library does not provide robust support for unbuffered streams, so you may need to use a third-party IO library like ```fast_io``` to achieve this.
 
-### Never assume int8_t or int_least8_t or int_fast8_t to be either integers or characters.
+### Avoid assuming that ```int8_t```, ```int_least8_t```, or ```int_fast8_t``` are not character types.
 
 ```cpp
 int8_t *p{};
