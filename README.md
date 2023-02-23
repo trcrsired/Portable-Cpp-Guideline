@@ -448,8 +448,8 @@ The ```<cctype>``` header is notoriously problematic. It's slow, not thread-safe
 3. Due to its locale usage, the function does not always provide deterministic results.
 4. The function is very slow, and in many implementations, even a trivial task like this would be a DLL indirect call. This can result in a significant performance hit, especially on platforms like Windows where it can cause a 100x performance downgrade.
 5. The function is neither constexpr nor noexcept, making it a poor choice.
-6. The function is not generic and only works for char. It does not work for char16_t, for example.
-7. Additionally, the <cctype> header is not freestanding, which means it cannot be used in certain contexts.
+6. The function is not generic and only works for ```char```. It does not work for ```char8_t``` or ```char16_t```, for example.
+7. Additionally, the ```<cctype>``` header is not freestanding, which means it cannot be used in certain contexts.
 
 In summary, it's best to avoid using the <cctype> header and other locale-dependent features to ensure better performance, thread safety, and determinism in your code.
 
