@@ -1,6 +1,6 @@
 # Portable C++ Guideline
 
-Are you interested in writing portable and efficient C++ code? Look no further than this guideline! Unlike other guidelines, such as the C++ Core Guideline, our guidelines prioritize portability and avoid problematic coding practices.
+Are you interested in writing portable and efficient C++ code? Look no further than this guideline! Unlike other guidelines, such as the [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines), our guidelines prioritize portability and avoid problematic coding practices.
 
 It's important to remember that there's no such thing as a zero-cost or zero-overhead (runtime) abstraction. Beware of anyone who claims otherwise! Even features like borrow checkers and C++ exceptions have runtime overhead (see here: [When Zero Cost Abstractions Aren't Zero Cost
 ](https://blog.polybdenum.com/2021/08/09/when-zero-cost-abstractions-aren-t-zero-cost.html) and here: [Zero-cost exceptions aren’t actually zero cost](https://devblogs.microsoft.com/oldnewthing/20220228-00/?p=106296)).
