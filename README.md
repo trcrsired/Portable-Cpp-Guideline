@@ -514,34 +514,29 @@ std::cout<<std::format("{}\n",p);//DANGER!!!
 ```
 ### Be cautious of the endianness of ```wchar_t```
 
-It might be surprising that the endianness of ```wchar_t``` may not be the same as the endianness of your native endian.
-
-For example, the execution encoding of ```wchar_t``` may be UTF32BE, but your machine's endianness is little. That means any options you do for ```wchar_t``` need to swap its endianness before doing anything.
-
-Other character types, including ```char16_t``` and ```char32_t``` do not have this issue. Their endianness are always the same as your machine's endiannness.
+When working with wchar_t, it's important to be aware of its endianness. It's possible for the endianness of wchar_t to differ from that of your native machine. For instance, wchar_t may use the UTF32BE execution encoding, while your machine uses little endian. This means that any operations you perform on wchar_t may require swapping its endianness first. Other character types, such as char16_t and char32_t, don't have this issue, as their endianness always matches that of your machine.
 
 ### Prefer integer types in ```<cstdint>``` than basic integer types
 
-They have the same issue with int. C++ standard never said how large sizeof(T) for short, int, long and long long.
-
+It's recommended to use integer types in ```<cstdint>``` instead of basic integer types like ```int```. The C++ standard doesn't specify the size of ```sizeof(T)``` for ```short```, ```int```, ```long```, and ```long long```, so relying on these types can lead to unexpected behavior.
 
 ### Prefer ```::std::(u)int_leastxx_t``` over ```::std::(u)intxx_t```
 
-Types like ```::std::(u)intxx_t``` are optional and may not exist. They happen when a single byte in some architectures is not 8 bits which might save a lot of money for specific embedded systems. For maximumly portable code, just use ```::std::(u)int_leastxx_t```
-
-### Using ```INTXX_C()``` and ```UINTXX_C()``` macros to define consts for ```::std::(u)int_leastxx_t```.
-
-C and C++ standard provides this header that makes our life much easier when dealing with ```::std::(u)int_leastxx_t```. Despite the name indicates they are for ```::std::(u)intxx_t```, actually they refer to define consts for ```::std::(u)int_leastxx_t```, which is quite interesting. ```INT_LEASTXX_C()``` does not exist.
+It's best to use ```::std::(u)int_leastxx_t``` rather than ```::std::(u)intxx_t```, as the latter types are optional and may not exist. They are used when a single byte on certain architectures isn't 8 bits, which can save money for embedded systems. For maximum portability, always use ```::std::(u)int_leastxx_t```. It's also recommended to use the ```INTXX_C()``` and ```UINTXX_C()``` macros to define constants for ```::std::(u)int_leastxx_t```, as this makes working with these types much easier. It's worth noting that despite their names, these macros are used to define constants for ```::std::(u)int_leastxx_t```, not ```::std::(u)intxx_t```.
 
 ### Avoid __uint128_t for GCC and clang
 
-Reasons:
-1. They only exist for 64 bits targets.
-2. Even 64 bits targets do not generate good code for compilers. Better way is to unpack ```__uint128_t``` to two ```::std::uint_least64_t```.
+These types only exist for 64-bit targets, and even then, they don't generate efficient code for compilers. It's better to unpack ```__uint128_t``` into two ```::std::uint_least64_t```.
 
 ### Do not use ```::std::uintmax_t``` and ```::std::intmax_t```
 
-They have caused a lot of troubles for ABI stablities issues for C and C++. Just do not use them.
+The reason to avoid using ```::std::uintmax_t``` and ```::std::intmax_t``` is because they can cause issues with ABI (Application Binary Interface) stability in C and C++.
+
+ABI stability refers to the ability of a library or program to maintain compatibility with other libraries or programs that use it, even when changes are made to the implementation details of that library or program.
+
+In the case of ```::std::uintmax_t``` and ```::std::intmax_t```, using these types can cause ABI issues because their size can vary depending on the platform and compiler being used. This can lead to compatibility issues when trying to use a library or program that was compiled with a different size for these types.
+
+To avoid these issues and ensure compatibility, it's best to use fixed-size integer types like ```::std::(u)int_leastxx_t``` instead.
 
 ## Floating Points
 
@@ -598,11 +593,13 @@ constexpr float Q_rsqrt(float number) noexcept
 
 ### Prefer GCC and clang's vector extension over ```<immintrin.h>``` when you need SIMD
 
-Vector extensions are more fundamental and more flexible. They work on a lot of platforms, including wasm.
+When you need to use SIMD (Single Instruction Multiple Data) in your code, it's generally better to use GCC and Clang's vector extensions instead of the ```<immintrin.h>``` library.
 
-https://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html
+The vector extensions are more fundamental and more flexible, and they work on a variety of platforms, including wasm. You can find more information about the vector extensions in the GCC documentation.
 
-Things like ```_m128``` are implemented with vector extensions on GCC and clang. As a result, there is no point to use them.
+It's worth noting that some types of SIMD data, such as ```_m128```, are actually implemented using vector extensions on GCC and Clang. This means that using the ```<immintrin.h>``` library to work with these types may not provide any additional benefits and may add unnecessary complexity to your code.
+
+In general, using the vector extensions provided by GCC and Clang is a simpler and more portable way to incorporate SIMD operations into your code.
 
 ## Todo: Threads
 
@@ -610,7 +607,15 @@ Do not use them unless you guard against the platform you are using exactly.
 
 ### Never use spin lock.
 
-Spin lock screws up kernel scheduling. See Linus Torvalds' rant.
+Spin locks are a synchronization primitive used in multithreaded programming to ensure that only one thread is accessing a shared resource at a time. When one thread acquires a spin lock, other threads that try to acquire the same lock will spin in a loop, waiting for the lock to be released.
+
+However, spin locks can cause problems in certain contexts. For example, if a thread holding a spin lock is preempted by the kernel scheduler, other threads waiting for the lock will spin indefinitely, consuming CPU resources and potentially causing the system to become unresponsive.
+
+This issue was famously highlighted by Linus Torvalds, the creator of the Linux operating system, in a rant from 2007. In his post, Torvalds criticized the use of spin locks in the kernel and argued that they should be replaced with other synchronization primitives that were less likely to cause scheduling problems.
+
+While spin locks can be useful in certain situations, it's important to use them judiciously and be aware of their potential downsides. In particular, in contexts where preemptive scheduling is used, it's generally better to use other synchronization primitives, such as mutexes or semaphores, that are less likely to cause scheduling problems.
+
+See Linus Torvalds' rant.
 
 https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723
 
@@ -718,11 +723,13 @@ https://github.com/trcrsired/fast_io/blob/master/include/fast_io_hosted/platform
 
 ### Call ```A``` APIS for Windows 9x kernels and ```W``` APIS for Windows NT kernels.
 
-On Windows 95/98 and ME, only A Apis are available. W apis do exist but they do not do anything.
+For Windows programming, it's important to know which API to call depending on the version of the operating system. In general, it's recommended to use the W APIs on modern versions of Windows, such as Windows NT-based systems, including Windows 10.
 
-On Windows NT-based systems, including Windows 10, you should use W APIs and avoid A APIs. The problem is that Windows Locale will influence the behavior of A APIs and cause issues. All NT apis are unicode APIs.
+However, on older versions of Windows, such as Windows 95/98 and ME, only the A APIs are available. The W APIs do exist, but they don't do anything on these systems.
 
-You can import those APIs with C++ ```char8_t``` and ```char16_t```. That will get rid of the troubles for ```wchar_t``` and execution charset.
+The problem with using the A APIs on modern versions of Windows is that they are influenced by the Windows Locale, which can cause issues. In contrast, all NT APIs are unicode APIs, so using the W APIs is generally safer and more portable.
+
+To avoid issues with the wchar_t type and execution charset, it's recommended to import the APIs using C++'s char8_t and char16_t types instead. This can help ensure that your code is more portable and less likely to encounter issues related to character encoding and localization.
 
 ```cpp
 //Use if constexpr to trivialize the API calls.
