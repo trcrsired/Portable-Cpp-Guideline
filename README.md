@@ -276,7 +276,7 @@ if (buffer)
 
 Libraries like ```fast_io``` provide direct support for file loading and handling all the corner cases for you, including transparent support for platforms that do not offer memory mapping (like web assembly). The memory is writable.
 
-https://github.com/cppfastio/fast_io
+[fast_io](https://github.com/cppfastio/fast_io)
 
 ```cpp
 /*
@@ -343,10 +343,11 @@ Ultimately, the bloat in binary size caused by C++ exceptions is yet another cha
 4. C++ exception handling does not work well with ASLR (Address Space Layout Randomization) and PIC (Position Independent Code), as loaders must relocate all exception table pointers, which can break ABIs. Recent security papers have discussed ways to make this work with PIC, but it may still break ABIs.
 5. C header files often do not correctly mark their functions with the "noexcept" specifier, creating not only performance issues but also technically violating the One-Definition Rule (ODR). Calling C APIs that are not "noexcept"-marked results in undefined behavior, regardless of the exception handling model.
 6. Throwing C++ exceptions can be extremely costly, potentially taking 200-300 times longer than a syscall instruction on x86_64.
-7. C++ exceptions do not work well in multithreaded systems, which has become a significant problem as more and more software becomes multithreaded. The paper "C++ exceptions are becoming more and more problematic" (https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html) provides more information on this issue.
+7. C++ exceptions do not work well in multithreaded systems, which has become a significant problem as more and more software becomes multithreaded. The paper [C++ exceptions are becoming more and more problematic](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html) provides more information on this issue.
 8. Statistics show that 95% of exceptions are due to programming bugs, and these cases should be dealt with using assertions or even "std::terminate" rather than throwing exceptions, as this can result in improved exception-safety and performance.
 
-C++ Exceptions are widely considered to be a significant pain point in the language, with few redeeming qualities. However, some members of the C++ community see hope in proposals like Herb Sutter's P0709R0. For more information, you can watch his video presentation here: https://www.youtube.com/watch?v=ARYP83yNAWk
+C++ Exceptions are widely considered to be a significant pain point in the language, with few redeeming qualities. However, some members of the C++ community see hope in proposals like Herb Sutter's P0709R0. For more information, you can watch his video presentation here: [De-fragmenting C++: Making Exceptions and RTTI More Affordable and Usable - Herb Sutter CppCon 2019
+](https://www.youtube.com/watch?v=ARYP83yNAWk)
 
 ## IO
 
@@ -859,7 +860,9 @@ Windows targets in GCC support three different threading ABIs, including win32, 
 
 ### The Purpose of ```inline``` in C++: Preventing ODR Violations, Not for Hints or Expansions.
 
-The purpose of the ```inline``` keyword in C++ is to prevent ODR (One Definition Rule) violations, not for providing hints or expansions. However, the keyword's usage is often confusing due to its different meanings compared to C. If a function with the same signature is defined in multiple translation units, the linker will fail to link them. When a function is marked as inline, the linker can discard any functions with the same signature and keep only one copy, assuming they work the same. However, if they don't work the same, it results in undefined behavior. Additionally, marking a function as inline allows GCC and clang to avoid emitting the function unless it's used, which is important for preventing dead code. For a better understanding of inline, watch the video at https://www.youtube.com/watch?v=6WjKIStrc80 and refer to this article https://devblogs.microsoft.com/oldnewthing/20200521-00/?p=103777.
+The purpose of the ```inline``` keyword in C++ is to prevent ODR (One Definition Rule) violations, not for providing hints or expansions. However, the keyword's usage is often confusing due to its different meanings compared to C. If a function with the same signature is defined in multiple translation units, the linker will fail to link them. When a function is marked as inline, the linker can discard any functions with the same signature and keep only one copy, assuming they work the same. However, if they don't work the same, it results in undefined behavior. Additionally, marking a function as inline allows GCC and clang to avoid emitting the function unless it's used, which is important for preventing dead code. For a better understanding of inline, watch the video at [What does the keyword "inline" REALLY mean in C++??
+](https://www.youtube.com/watch?v=6WjKIStrc80) and refer to this article [A noinline inline function? What sorcery is this?
+](https://devblogs.microsoft.com/oldnewthing/20200521-00/?p=103777).
 
 ### To ensure maximum portability, it is recommended to build and test your code on as many GCC cross/canadian toolchains as possible.
 
