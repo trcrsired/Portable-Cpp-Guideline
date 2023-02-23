@@ -322,12 +322,12 @@ In general, ```std::unique_ptr``` is not a smart pointer but rather a questionab
 
 C++ exception is probably the largest issue for portability. Even Linus Torvalds complaint about C++ EH before.
 
-http://harmful.cat-v.org/software/c++/linus
+[Linus Torvalds on C++](http://harmful.cat-v.org/software/c++/linus)
 
 ### Many platforms do not provide exceptions.
 The issue with C++ exception handling goes beyond just portability. The reliance on operating system support and hosted C++ features makes it difficult to use in various contexts, including embedded systems and operating system development. This limitation can pose significant challenges for developers who want to write portable code.
 
-The lack of support for exceptions on certain architectures, such as AVR and wasm, is another major challenge. While some tools, such as wasm2lua (https://github.com/SwadicalRag/wasm2lua), allow for the compilation of C++ code to other languages, implementing C++-style exception handling in these contexts can be a difficult and performance-intensive process.
+The lack of support for exceptions on certain architectures, such as AVR and wasm, is another major challenge. While some tools, such as [wasm2lua](https://github.com/SwadicalRag/wasm2lua), allow for the compilation of C++ code to other languages, implementing C++-style exception handling in these contexts can be a difficult and performance-intensive process.
 
 Even on platforms that do support exceptions, the performance hit can be significant. The SJLJ exception, a common implementation for many platforms, can slow down both happy and slow paths. This can make exception handling impractical for performance-critical applications.
 
