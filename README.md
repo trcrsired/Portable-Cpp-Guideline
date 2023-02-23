@@ -141,11 +141,11 @@ x86_64-elf-g++ -c carray.cc -O3 -std=c++23 -s -flto
 ```
 
 Update:
-std::array is NOT freestanding in C++23. It may be freestanding in future C++ standards.
+In C++23, std::array is not considered freestanding. However, it is possible that it will become freestanding in future versions of the C++ standard.
 
 ### Consider Freestanding Alternatives to C++ Containers, Iterators, Algorithms, and Allocators
 
-To achieve maximum portability, it is recommended to avoid all C++ containers, iterators, algorithms, and allocators. These components are not freestanding and have complex designs that interact with heap and exception handling, creating portability issues when included. Despite being promoted as the default container in "modern" C++ books and the C++ Core Guidelines, std::vector is not freestanding, and including it can cause portability issues. Additionally, allocators are not freestanding, and even std::allocator cannot be considered freestanding due to its interaction with exceptions. If exceptions are disabled, dependencies to exceptions remain, causing linkage errors or binary bloat issues.
+To achieve maximum portability, it is recommended to avoid all C++ containers, iterators, algorithms, and allocators. These components are not freestanding and have complex designs that interact with heap and exception handling, creating portability issues when included. Despite being promoted as the default container in "modern" C++ books and the C++ Core Guidelines, ```std::vector``` is not freestanding, and including it can cause portability issues. Additionally, allocators are not freestanding, and even ```std::allocator``` cannot be considered freestanding due to its interaction with exceptions. If exceptions are disabled, dependencies to exceptions remain, causing linkage errors or binary bloat issues.
 
 ```cpp
 /// WRONG!!! <vector> is not freestanding
@@ -178,8 +178,7 @@ Yes, I know ```<new>``` is freestanding. However, C++ standard does not design i
 
 ### Avoid ```std::nothrow```
 
-NEVER use ```std::nothrow``` and ```std::nothrow_t```. C++ standard library implements nothrow new with thrown new. Even worse, the C++ standard does not allow override the default impementations for operator new(std::nothrow_t const&) as operator new() does. There is no reason to use it.
-
+Avoid using ```std::nothrow``` and ``std::nothrow_t`` in C++, as the standard library implements nothrow new by internally using thrown new. This means that ```std::nothrow``` provides no guarantee that memory allocation will not throw an exception. Additionally, the C++ standard does not allow overriding the default implementation of ```operator new(std::nothrow_t const&)```, unlike ```operator new()```. Therefore, there is no practical benefit to using ```std::nothrow```, and it should be avoided. Additionally, exceptions should be avoided in freestanding environments, so it is recommended to implement custom memory allocation functions that do not throw exceptions.
 
 ```cpp
 /*
