@@ -18,7 +18,7 @@ If you want to ensure that your code works in a freestanding environment, you ca
 
 ### Avoid using ```std::addressof``` before C++23 and the ```operator &``` all the time
 
-This is because C++ allows overloading of the ```operator &``` which is a historical mistake. To overcome this issue, the ISO C++11 standard introduced ```std::addressof```. However, it was not until C++17 that ```std::addressof``` became constexpr. Unfortunately, ```std::addressof``` is part of the ```<memory>``` header which is not freestanding, making it impossible to implement it in C++ without compiler magic before C++23. In C++23, the memory header is finally made freestanding, but it is important to update to the latest toolchains to ensure its availability. It is worth noting that function pointers cannot use ```std::addressof``` and must use ```operator &``` to get their address.
+This is because C++ allows overloading of the ```operator &``` which is a historical mistake. To overcome this issue, the ISO C++11 standard introduced ```std::addressof```. However, it was not until C++17 that ```std::addressof``` became constexpr. Unfortunately, ```std::addressof``` is part of the ```<memory>``` header which is not freestanding, making it impossible to implement it in C++ without compiler magic before C++23. In C++23, the ```<memory>``` header is finally made partial freestanding, but it is important to update to the latest toolchains to ensure its availability. It is worth noting that function pointers cannot use ```std::addressof``` and must use ```operator &``` to get their address.
 
 ```cpp
 //bad! memory header may not be available before C++23.
