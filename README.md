@@ -18,7 +18,7 @@ If you want to ensure that your code works in a freestanding environment, you ca
 
 ### Avoid ```std::addressof``` and ```operator &``` before C++23
 
-C++ allows overloading operator &, which is a historical mistake. ISO C++ 11 standard introduces std::addressof that would fix the issue. C++17 allows std::addressof to be constexpr Unfortunately, ```std::addressof``` is in ```<memory>``` header, which is not freestanding. The std::addressof is impossible to implement in C++ without compiler magic.
+This is because C++ allows ```operator &``` to be overloaded, which is a mistake from a historical perspective. To address this issue, the ISO C++ 11 standard introduced ```std::addressof```. However, in C++17, ```std::addressof``` was made constexpr. Unfortunately, ```std::addressof``` is part of the ```<memory>``` header, which is not freestanding. As a result, implementing ```std::addressof``` in C++ without compiler magic is impossible.
 
 ```cpp
 //bad! memory header may not be available.
@@ -67,9 +67,7 @@ C++23 finally adds ```<memory>``` as partial freestanding header and ```std::add
 
 ### Avoid ```std::move```, ```std::forward``` and ```std::move_if_noexcept``` Before C++23
 
-```std::move```, ```std::forward``` and ```std::move_if_noexcept``` are in ```<utility>``` header, which are not freestanding.
-
-The safest thing is to write them by yourself. Unfortunately, recently clang 15 added a patch that would treat ```std::move```, ```std::forward```, ```std::addressof```, ```std::__addressof``` and ```std::move_if_noexcept``` as compiler magics which means we cannot get 100% efficiency by writing by ourselves.
+The functions ```std::move```, ```std::forward```, and ```std::move_if_noexcept``` are defined in the <utility> header, which is not freestanding. To ensure maximum portability, it's recommended to write these functions yourself. However, it's worth noting that recent versions of the Clang compiler (version 15 onwards) have added a patch that treats these functions as compiler magics. As a result, it may not be possible to achieve 100% efficiency by writing these functions yourself.
 
 ```cpp
 //bad! utility header may not be available.
@@ -97,8 +95,7 @@ C++23 finally adds ```<utility>``` as freestanding header and ```std::move```, `
 
 ### Avoid ```std::array```
 
-The same issue as why you should avoid ```std::addressof```, ```std::move```, and etc. ```<array>``` header is not freestanding.
-
+Similar to the reasons why you should avoid using ```std::addressof``` and ```std::move```, the ```<array>``` header is also not freestanding
 
 ```cpp
 //bad! array header may not be available.
@@ -445,18 +442,23 @@ Overall, C++17's std::filesystem is not a good API to use and should be avoided.
 
 ### Do not use ```<format>```
 
-### Avoid any feature that uses locale internally. Particularly ```<cctype>```
+### Avoid any feature that uses locale internally, especially ```<cctype>``` header.
 
-```<cctype>``` is a very horrible header. It is slow and not thread-safe. It also creates undefined behavior randomly. Most C++ books would recommend you for using things like ```isupper(3)``` to detect whether a character is uppercase or not. This is a horrible recommendation.
+It's highly recommended to avoid using any feature that uses locale internally, especially the <cctype> header.
 
-1. For isupper(ch), the function assumes ch is in the range [0,127]. That means you can randomly trigger undefined behavior if you do not do the checks before.
-2. the function is locale-aware. Locale is not thread-safe. You will screw it up.
-3. Due to its locale usage, it does not answer deterministically.
-4. It is very slow. Most of the implementation would make this call a DLL indirect call, even if you are doing a trivial task like this. I have seen on platforms like windows that using it would cause a performance downgrade of 100x.
-5. It is not constexpr nor noexcept. This API is BAD.
-6. It is not generic and it only works for char. It does not work for char16_t for example.
-7. The header is not freestanding. You cannot use them.
-```cpp
+The ```<cctype>``` header is notoriously problematic. It's slow, not thread-safe, and can create undefined behavior at random. Some C++ books suggest using functions like ```isupper(3)``` to check whether a character is uppercase, but this is a terrible recommendation for several reasons:
+
+1. The ```isupper(ch)``` function assumes ch is in the range [0,127], which means undefined behavior can be triggered randomly if checks aren't done beforehand.
+2. The function is locale-aware, and locale is not thread-safe. This can lead to issues.
+3. Due to its locale usage, the function does not always provide deterministic results.
+4. The function is very slow, and in many implementations, even a trivial task like this would be a DLL indirect call. This can result in a significant performance hit, especially on platforms like Windows where it can cause a 100x performance downgrade.
+5. The function is neither constexpr nor noexcept, making it a poor choice.
+6. The function is not generic and only works for char. It does not work for char16_t, for example.
+7. Additionally, the <cctype> header is not freestanding, which means it cannot be used in certain contexts.
+
+In summary, it's best to avoid using the <cctype> header and other locale-dependent features to ensure better performance, thread safety, and determinism in your code.
+
+	```cpp
 char ch{};
 if(isupper(ch))//BAD
 	puts("Do something\n");
