@@ -661,6 +661,28 @@ In terms of efficient bounds checking, it is recommended to use macros like ```_
 
 Finally, memory tagging is a powerful tool for defending against memory safety bugs. By adding tags to memory allocations, developers can detect buffer overflows, use-after-free errors, and other common memory safety issues. This can help prevent exploits and improve overall program stability.
 
+It's recommended to include the following flags when compiling with GCC and Clang:
+
+Wall -Wextra -Wpedantic -Wmisleading-indentation -Wunused -Wuninitialized -Wshadow -Wconversion
+
+here is an extended explanation of each flag:
+
+-Wall: Enables all warnings that are deemed safe enough to be enabled by default. However, this does not enable all warnings that GCC or Clang is capable of generating.
+
+-Wextra: Enables even more warnings, including some that are not enabled by -Wall, such as warnings about uninitialized variables and unused function parameters.
+
+-Wpedantic: Enables warnings about non-standard code, as defined by the relevant language standard. This can be useful for ensuring portability of code between different compilers and platforms.
+
+-Wmisleading-indentation: Warns about possible misleading indentation, which can lead to code that is difficult to read and understand.
+
+-Wunused: Warns about unused variables, functions, and other entities. This can help identify code that is no longer needed, or code that has not yet been completed.
+
+-Wuninitialized: Warns about using uninitialized variables. This can help catch potential bugs that might cause undefined behavior.
+
+-Wshadow: Warns about variables that shadow other variables with the same name in an outer scope. This can help avoid confusion and unintended behavior.
+
+-Wconversion: Warns about implicit conversions that might result in loss of data or precision. This can help catch potential bugs and improve code quality.
+
 ## Windows specific
 
 ### Guard Windows specific code with ```#if (defined(_WIN32) && !defined(__WINE__)) || defined(__CYGWIN__)```
