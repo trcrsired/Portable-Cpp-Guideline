@@ -854,7 +854,7 @@ This will help you identify potential issues early on and allow you to develop a
 3. When using ```std::unique_ptr``` for pimpl, it is not recommended due to the compilation speed issue. Instead, module usage can help address the issue. Additionally, it is important to note that ```std::unique_ptr``` is not ABI-stable, which is caused by a bug in the previous point.
 3. While ```std::unique_ptr``` helps with memory leaks, it cannot fix issues like type-confusions or vptr-injection.
 4. Using ```std::unique_ptr``` to manage resources beyond memory is generally ineffective since APIs often do not support specific types like Unix file descriptors or SQLite3. Writing a class to wrap these resources is preferable to address all related issues, such as ignoring error codes.
-5. Compilation speeds may suffer due to the inclusion of the ```memory``` header.
+5. Compilation speeds may suffer due to the inclusion of the ```<memory>``` header.
 6. Overuse of ```nullptr``` may occur when relying on ```std::unique_ptr``` to represent empty states.
 7. The deleter of ```std::unique_ptr``` can lead to inefficiencies, and it is challenging to avoid unintended performance degradation, regardless of whether the deleter is a lambda, function pointer, or function object.
 8. Before using ```std::unique_ptr``` to make non-movable objects movable, it is important to question why the type is unmovable in the first place.
