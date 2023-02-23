@@ -9,13 +9,13 @@ Note that the current C++ standard is C++23.
 
 ## Freestanding
 
-To write truly portable C++ code, it's important to stick to the freestanding C++ part and use platform macros to guard against the hosted environment. The cppreference website (https://en.cppreference.com/w/cpp/freestanding) provides a useful guide on freestanding implementations and the functions available in this environment.
+To write truly portable C++ code, it's important to stick to the freestanding C++ part and use platform macros to guard against the hosted environment. The cppreference website page [Freestanding and hosted implementations](https://en.cppreference.com/w/cpp/freestanding) provides a useful guide on freestanding implementations and the functions available in this environment.
 
 
 However, it's important to note that many headers that you may assume should be available may not be present in a freestanding environment. Additionally, certain headers that are available may have limitations or issues that could prevent you from using them.
 
 
-If you want to ensure that your code works in a freestanding environment, you can try using the x86_64-elf-gcc compiler. This compiler is available on the following GitHub repository: https://github.com/trcrsired/windows-hosted-x86_64-elf-toolchains
+If you want to ensure that your code works in a freestanding environment, you can try using the x86_64-elf-gcc compiler. This compiler is available on the following GitHub repository: [windows-hosted-x86_64-elf-toolchains](https://github.com/trcrsired/windows-hosted-x86_64-elf-toolchains)
 
 ### Avoid using ```std::addressof``` before C++23 and the ```operator &``` all the time
 
