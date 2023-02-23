@@ -352,9 +352,13 @@ The behavior of stdio and iostream can change randomly with locale settings, mak
 
 Changes to locale settings at runtime can cause thread-safety issues with stdio and iostream. Additionally, iostream does not have any built-in thread awareness or locking mechanisms, leading to potential issues when multiple threads access the stream.
 
-### Using ```printf``` family functions incorrectly are always severe security vulnerabilities.
+### Improper usage of the ```printf``` family of functions can lead to severe security vulnerabilities.
 
-Usage of ```printf``` functions must be cautious.
+The ```printf``` family of functions are powerful tools for formatting and printing output to the console, but they can also be a source of serious security vulnerabilities if used improperly. One of the most common ways that printf functions can be misused is through format string attacks, which occur when an attacker is able to inject format specifiers into a printf call, causing the program to output data from the stack or other sensitive areas of memory.
+
+To avoid these kinds of vulnerabilities, it's important to always use printf functions with caution. This means carefully validating and sanitizing any input that will be used in a printf call, and avoiding the use of format strings that can be controlled by an attacker. Additionally, it's important to always use the correct format specifiers for the data being printed, and to avoid using the %n specifier, which can be used to write to arbitrary memory locations.
+
+Overall, while printf functions can be a powerful and useful tool, it's important to use them with care and attention to detail to avoid introducing security vulnerabilities into your code.
 
 ```cpp
 inline void foo(std::string const& str)
