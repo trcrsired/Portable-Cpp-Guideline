@@ -18,10 +18,10 @@ If you want to ensure that your code works in a freestanding environment, you ca
 
 ### Avoid using ```std::addressof``` before C++23 and the ```operator &``` all the time
 
-This is because C++ allows ```operator &``` to be overloaded, which is a mistake from a historical perspective. To address this issue, the ISO C++ 11 standard introduced ```std::addressof```. However, in C++17, ```std::addressof``` was made constexpr. Unfortunately, ```std::addressof``` is part of the ```<memory>``` header, which is not freestanding. As a result, implementing ```std::addressof``` in C++ without compiler magic is impossible.
+This is because C++ allows overloading of the ```operator &``` which is a historical mistake. To overcome this issue, the ISO C++11 standard introduced ```std::addressof```. However, it was not until C++17 that ```std::addressof``` became constexpr. Unfortunately, ```std::addressof``` is part of the ```<memory>``` header which is not freestanding, making it impossible to implement it in C++ without compiler magic before C++23. In C++23, the memory header is finally made freestanding, but it is important to update to the latest toolchains to ensure its availability. It is worth noting that function pointers cannot use ```std::addressof``` and must use ```operator &``` to get their address.
 
 ```cpp
-//bad! memory header may not be available.
+//bad! memory header may not be available before C++23.
 //#include <memory> may also hurt compilation speed
 #include<memory>
 
@@ -60,10 +60,6 @@ D:\Desktop>x86_64-elf-g++ -c builtin_addressof.cc -O3 -std=c++23 -s -flto
 Compilation success
 */
 ```
-
-Update:
-
-C++23 finally adds ```<memory>``` as partial freestanding header and ```std::addressof``` is now freestanding. However you need to ensure you use latest compilers that support C++23.
 
 ### Avoid ```std::move```, ```std::forward``` and ```std::move_if_noexcept``` Before C++23
 
