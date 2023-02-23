@@ -776,9 +776,9 @@ inline void* my_create_file(Args... args) noexcept
 
 This rule applies to CRT APIs, including fopen(3) _fdopen(3). You should _wfdopen for windows NT (Yes, this includes Windows 10). Better use them with win32 or NT APIs.
 
-### Windows does provide file descriptors, and file descriptors on Windows are not win32 HANDLE
+### Windows does provide file descriptors, and they are not the same as win32 HANDLE.
 
-I have heard many people say windows do not provide file descriptors, which is untrue. The windows CRT implements file descriptors with win32 HANDLE.
+Windows does provide file descriptors, and the Windows CRT actually implements file descriptors using Win32 HANDLE internally. So, although the programming interface to access file descriptors on Windows is different from that on UNIX-based systems, file descriptors can still be used in Windows programs.
 
 See the API: ```_open_osfhandle```
 https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/open-osfhandle?view=msvc-170
