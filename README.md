@@ -369,11 +369,15 @@ inline void foo(std::string const& str)
 }
 ```
 
-### Never use ```std::endl```
+### Avoid using ```std::endl``` in your C++ code.
 
-It is completely redundant. The tie mechanism of stream knows when to flush when deal with input and does the right thing automatically.
+One of the primary issues with using ```std::endl``` is the impact it can have on performance. Since ```std::endl``` flushes the output buffer every time you insert a new line character, it can be inefficient if you are printing a lot of output. This can slow down your program and make it less responsive, especially if you are working with large data sets or running your program on a slow machine.
 
-Even you just want to flush the stream, you still have tons of other options. One is to manually flush the buffered stream. If you want to flush out every time, you probably need unbuffered stream. Unfortunately C++ stream does not provide enough support with unbuffered stream and that is why you need ```fast_io```
+Another problem with using ```std::endl``` is that it can be redundant. C++ output streams include a mechanism called "tie" that automatically flushes the output buffer when necessary, such as when the buffer is full or when the program terminates. This means that using std::endl to manually flush the buffer is often unnecessary and can even interfere with the automatic flushing mechanism.
+
+To avoid these issues, it's generally better to rely on the automatic flushing mechanism built into C++ output streams and avoid using ```std::endl``` altogether. If you do need to flush the buffer at a specific point in your code, you can use the ```flush()``` method on the stream object itself. This method only flushes the buffer and does not insert a new line character, which can improve performance in cases where you do not need to print a new line.
+
+If you want to print your output immediately without buffering, you can use unbuffered streams. However, the C++ stream library does not provide robust support for unbuffered streams, so you may need to use a third-party IO library like ```fast_io``` to achieve this.
 
 ### Never assume int8_t or int_least8_t or int_fast8_t to be either integers or characters.
 
@@ -388,21 +392,27 @@ Unfortunately, random pitfalls like that are everywhere for iostream.
 
 ### Prefer ```fast_io``` over stdio and iostream
 
-```fast_io``` library does not have all the issues we discussed before and provides tons of features stdio and iostream do not provide. However, it also offers deep understanding and hacking of stdio and iostream so that fast_io would expose more internal details for stdio and iostream.
+It is recommended to use the ```fast_io``` library over ```stdio``` and ```iostream``` for improved performance and additional features. Unlike ```stdio``` and ```iostream```, fast_io is not plagued with issues such as buffering and provides more comprehensive functionality.
 
-More importantly, ```fast_io``` is usually 10x or even 100x faster than stdio and iostream due to little redundant work to do compared to stdio and iostream.
+Furthermore, ```fast_io``` offers a deep understanding and integration of ```stdio``` and ```iostream```, exposing more internal details that are not readily available with these standard libraries.
+
+Perhaps the most significant advantage of using ```fast_io``` is the dramatic increase in speed. ```fast_io``` is generally 10-100 times faster than ```stdio``` and ```iostream``` due to the minimal redundant work that it performs in comparison. This enhanced performance can be particularly beneficial for applications that require a large amount of data processing or need to handle data in real-time.
 
 ### Do not assume ```write(2)``` or ```read(2)``` would do "real IO"
 
-Most of the time, the operating system kernel would cache files into memory so that users would read/write files very fast instead of blocking the process. That means syscalls like ```write(2)``` or ```read(2)``` do the job something like memcpy for most of their time. The data will flush out to disk regularly. That is why most of time, io does not take too much time but most of time would waste on overhead for the abstractions of iostream and stdio.
+It is important to avoid assuming that ```write(2)``` or ```read(2)``` system calls will always perform "real IO". In many cases, the operating system kernel caches files in memory to allow for fast file reads and writes without blocking the process. As a result, ```write(2)``` and ```read(2)``` often function similarly to ```memcpy()``` and may not perform actual IO in the traditional sense. The data will eventually be flushed out to disk, but this process may not happen immediately.
 
-### Do not assume stdio and iostream have the same relative performance on different platforms.
+As a consequence, IO operations typically do not take much time, with most of the time being spent on the overhead associated with the abstractions provided by iostream and stdio. It is therefore important to understand the underlying mechanisms involved in IO operations and to avoid making assumptions that can lead to inefficiencies or unexpected behavior.
 
-Different operating system and toolchains would provide different implementations of iostream and stdio. The performance gap between different platforms are huge. However, none of them could match the performance of fast_io in any way.
+### Avoid assuming consistent performance of stdio and iostream across various platforms.
 
-### ```<iostream>``` is implemented with ```<stdio.h>``` for all implementations. (libstdc++, libcxx and msvc stl)
+It is important to avoid assuming that the performance of iostream and stdio is consistent across different platforms. Different operating systems and toolchains may provide different implementations of these libraries, resulting in significant performance gaps between platforms. As a result, it is important to test and measure the performance of IO operations on each platform to ensure optimal performance.
 
-You can check that by the reading source of all of them. That is another why you should not use ```iostream``` since why would you use it when it just wraps ```stdio```?
+Moreover, while iostream and stdio are standard libraries and offer cross-platform compatibility, they may not be the fastest options for IO operations. As mentioned before, the ```fast_io``` library can often outperform these libraries by a significant margin due to its optimization for IO operations and reduced overhead. Therefore, it is worth considering alternative options such as ```fast_io``` for IO-intensive applications or performance-critical scenarios.
+
+### All C++ standard library implementations (libstdc++, libcxx, and msvc stl) implement ```<iostream>``` using ```<stdio.h>```.
+
+All implementations of ```<iostream>``` such as libstdc++, libcxx and msvc stl, use ```<stdio.h>``` in their implementation. This can be confirmed by examining the source code of each implementation. Due to this fact, it may not make sense to use iostream since it simply wraps around stdio.
 
 [GCC libstdc++](https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/std/fstream#L113)
 
@@ -410,17 +420,15 @@ You can check that by the reading source of all of them. That is another why you
 
 [MSVC STL](https://github.com/microsoft/STL/blob/main/stl/inc/fstream#L781)
 
-### Prefer stdio over iostream if you cannot use a third-party library.
+### Prefer ```stdio``` over ```iostream``` if you cannot use a third-party library.
 
-iostream bloats binary size due to its object-oriented design. Toolchain vendors never optimize iostream for embedded systems. A typical iostream implementation costs 1MB of binary size. Also, ```iostream``` needs to include all ```stdio``` code, so please just no iostream.
+Iostream can significantly increase binary size due to its object-oriented design, making it unsuitable for embedded systems. Toolchain vendors rarely optimize iostream for such systems, resulting in a typical implementation that can cost up to 1MB of binary size. Additionally, iostream needs to include all of stdio's code, making it even more bloated. In such cases, it is better to use stdio instead of iostream.
 
-### Do not use C++17 ```std::filesystem```
+### Avoid using C++17's std::filesystem
 
-```std::filesystem``` is not thread-safe since it is locale-aware. More importantly, the design of ```std::filesystem``` is very outdated. It does not even match the criteria of POSIX 2008. No ```at()``` methods are available for ```std::filesystem``` and you always suffer from [TOCTOU](https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use) security vulnerabilities.
+```std::filesystem```is not thread-safe due to its locale-aware nature. Moreover, its design is outdated and does not meet the criteria of POSIX 2008. The lack of available ```at()``` methods for ```std::filesystem``` means you will always face potential [TOCTOU](https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use) security vulnerabilities. The extensive use of locales also results in significant bloat, adding up to 1MB in some cases.
 
-Also, it is very bloat due its locale usage. It would usually bloat 1MB.
-
-As Herb Sutter pointed out in P0709, ```std::filesystem``` creates dual error reporting issues.
+In addition, as pointed out in Herb Sutter's P0709, ```std::filesystem``` creates dual error reporting issues.
 
 ```cpp
 //https://en.cppreference.com/w/cpp/filesystem/copy_file
@@ -431,7 +439,7 @@ bool copy_file( const std::filesystem::path& from,
                 std::error_code& ec ); // NOTICE!!! NOT NOEXCEPT
 ```
 
-C++17 filesystem are just bad apis. Never use it.
+Overall, C++17's std::filesystem is not a good API to use and should be avoided.
 
 ### Do not use ```<charconv>```
 
