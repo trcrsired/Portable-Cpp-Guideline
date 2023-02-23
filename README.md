@@ -143,11 +143,9 @@ x86_64-elf-g++ -c carray.cc -O3 -std=c++23 -s -flto
 Update:
 std::array is NOT freestanding in C++23. It may be freestanding in future C++ standards.
 
-### Avoid all C++ containers, iterators, algorithms, allocators
+### Consider Freestanding Alternatives to C++ Containers, Iterators, Algorithms, and Allocators
 
-None of the C++ Containers, Iterators, Algorithms, and Allocators are freestanding, and they won't be freestanding soon due to deeply complex designs interacting with heap and exception handling. (We will explain why in the next few chapters.)
-
-By C++ Core Guideline or "modern" C++ books, ```std::vector``` should be the default container. However,        ```<vector>``` is not freestanding. Including them creates a portability issue. Allocators are not freestanding either, and even ```std::allocator``` is freestanding (which it cannot due to interacting with exceptions), the vector itself will throw ```std::logic_error``` in methods like ```push_back()```. Disabling Exceptions handling will not remove the dependencies to exceptions which still cause either linkage errors or binary bloat issues.
+To achieve maximum portability, it is recommended to avoid all C++ containers, iterators, algorithms, and allocators. These components are not freestanding and have complex designs that interact with heap and exception handling, creating portability issues when included. Despite being promoted as the default container in "modern" C++ books and the C++ Core Guidelines, std::vector is not freestanding, and including it can cause portability issues. Additionally, allocators are not freestanding, and even std::allocator cannot be considered freestanding due to its interaction with exceptions. If exceptions are disabled, dependencies to exceptions remain, causing linkage errors or binary bloat issues.
 
 ```cpp
 /// WRONG!!! <vector> is not freestanding
@@ -341,7 +339,7 @@ Ultimately, the bloat in binary size caused by C++ exceptions is yet another cha
 7. C++ exceptions do not work well in multithreaded systems, which has become a significant problem as more and more software becomes multithreaded. The paper "C++ exceptions are becoming more and more problematic" (https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html) provides more information on this issue.
 8. Statistics show that 95% of exceptions are due to programming bugs, and these cases should be dealt with using assertions or even "std::terminate" rather than throwing exceptions, as this can result in improved exception-safety and performance.
 
-### C++ Exceptions are widely considered to be a significant pain point in the language, with few redeeming qualities. However, some members of the C++ community see hope in proposals like Herb Sutter's P0709R0. For more information, you can watch his video presentation here: https://www.youtube.com/watch?v=ARYP83yNAWk
+C++ Exceptions are widely considered to be a significant pain point in the language, with few redeeming qualities. However, some members of the C++ community see hope in proposals like Herb Sutter's P0709R0. For more information, you can watch his video presentation here: https://www.youtube.com/watch?v=ARYP83yNAWk
 
 ## IO
 
