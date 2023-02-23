@@ -240,7 +240,7 @@ Loading large files, such as images, into memory may seem like a reasonable appr
 4. Memory mapping allows file sharing among different processes, saving your physical memory.
 5. ```fseek(3)``` or ```seek(2)``` to load a file may create more TOCTOU security vulnerabilities.
 6. The overcommit is less likely if you do not write to the copy-on-write pages.
-7. Memory mapping creates a std::contiguous_range, which is extremely useful for many workflows.
+7. Memory mapping creates a ```std::contiguous_range```, which is extremely useful for many workflows.
 8. You can write to memory-mapped memory without changing the file's content if you load the pages with private pages. However, writing content to the memory region will trigger a page fault, and the operating system kernel will allocate new pages for your process.
 
 ```cpp
