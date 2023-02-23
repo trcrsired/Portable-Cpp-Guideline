@@ -221,17 +221,17 @@ It's best to avoid handling stack or heap allocation failure. One design flaw wi
 
 #### There is no way that you can always handle heap allocation failure to avoid crashing.
 
-In general, it's preferable to simply call std::abort if malloc(3) fails. Here are some reasons why:
+In general, it's preferable to simply call ```std::abort``` if ```malloc(3)``` fails. Here are some reasons why:
 
 1. Destructors can allocate memory again, creating a vicious cycle that can lead to unpredictable results.
-2. The GCC libsupc++ implementation uses an emergency heap, but even if you implement an emergency heap, it might still call std::terminate in many situations, leading to crashes. To verify this, I removed the emergency heap from the libsupc++ and found no issues, including no ABI issues.
+2. The GCC libsupc++ implementation uses an emergency heap, but even if you implement an emergency heap, it might still call ```std::terminate``` in many situations, leading to crashes. To verify this, I removed the emergency heap from the libsupc++ and found no issues, including no ABI issues.
 3. Many libraries beneath you, including Glibc, call xmalloc, which will still crash for malloc failure. You cannot avoid the issue unless you control all your source code.
 4. Operating systems like Linux will overcommit and kill your process if you hit allocation failures. In general, programming languages like C++ cannot handle allocation failures in any meaningful way, whether on the stack or the heap.
-5. C++'s new operator throws exceptions, and C++ codebases usually allocate memory on the heap using new, creating invisible code paths and potential exception-safety bugs.
+5. C++'s ```new``` operator throws exceptions, and C++ codebases usually allocate memory on the heap using new, creating invisible code paths and potential exception-safety bugs.
 
 #### If you want to load large files, consider using the memory mapping API instead of loading them into memory.
 
-While you might argue that you want to load large files, such as images, to memory, this is usually not the best approach. Instead, you should use fstat(2) or Linux's statx system call and memory mapping.
+Loading large files, such as images, into memory may seem like a reasonable approach, but it is often not the best solution. Instead, it is recommended to use system calls such as ```fstat(2)``` or Linux's ```statx``` to obtain information about the file and the ```mmap(2)``` syscall for memory mapping.
 
 ##### Advantages
 1. Memory mapping avoids the issue of file size overflow on 32-bit machines.
