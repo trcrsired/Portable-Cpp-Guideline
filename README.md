@@ -635,8 +635,7 @@ This issue was famously highlighted by Linus Torvalds, the creator of the Linux 
 While spin locks can be useful in certain situations, it's important to use them judiciously and be aware of their potential downsides. In particular, in contexts where preemptive scheduling is used, it's generally better to use other synchronization primitives, such as mutexes or semaphores, that are less likely to cause scheduling problems.
 
 See Linus Torvalds' rant.
-
-https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723
+[No nuances, just buggy code](https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723)
 
 ## Todo: OOP
 
