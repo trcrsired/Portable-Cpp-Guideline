@@ -855,8 +855,8 @@ This will help you identify potential issues early on and allow you to develop a
 3. While ```std::unique_ptr``` helps with memory leaks, it cannot fix issues like type-confusions or vptr-injection.
 4. Using ```std::unique_ptr``` to manage resources beyond memory is generally ineffective since APIs often do not support specific types like Unix file descriptors or SQLite3. Writing a class to wrap these resources is preferable to address all related issues, such as ignoring error codes.
 5. Compilation speeds may suffer due to the inclusion of the memory header.
-6. Overuse of nullptr may occur when relying on unique_ptr to represent empty states.
-7. The deleter of unique_ptr can lead to inefficiencies, and it is challenging to avoid unintended performance degradation, regardless of whether the deleter is a lambda, function pointer, or function object.
+6. Overuse of ```nullptr``` may occur when relying on ```std::unique_ptr``` to represent empty states.
+7. The deleter of ```std::unique_ptr``` can lead to inefficiencies, and it is challenging to avoid unintended performance degradation, regardless of whether the deleter is a lambda, function pointer, or function object.
 8. Before using ```std::unique_ptr``` to make non-movable objects movable, it is important to question why the type is unmovable in the first place.
 9. For ```std::unique_ptr<T[]>```, the ```[]``` can be easily forgotten, leading to undefined behavior.
 10. Implementing data structures with ```std::unique_ptr``` is always incorrect and may cause stack overflow.
