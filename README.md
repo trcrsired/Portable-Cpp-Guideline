@@ -800,8 +800,7 @@ This rule applies to CRT APIs, including fopen(3) _fdopen(3). You should _wfdope
 
 Windows does provide file descriptors, and the Windows CRT actually implements file descriptors using Win32 HANDLE internally. So, although the programming interface to access file descriptors on Windows is different from that on UNIX-based systems, file descriptors can still be used in Windows programs.
 
-See the API: ```_open_osfhandle```
-https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/open-osfhandle?view=msvc-170
+See the API: [```_open_osfhandle```](https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/open-osfhandle?view=msvc-170)
 
 ### Do not use ```std::unique_ptr``` for win32 ```HANDLE```
 
