@@ -785,7 +785,10 @@ https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/open-osfhandle?
 
 ### Do not use ```std::unique_ptr``` for win32 ```HANDLE```
 
-People love to abuse C++ smart pointers, nowadays.
+Avoid using std::unique_ptr for managing win32 HANDLE resources. While it may seem convenient to use C++ smart pointers, such as std::unique_ptr, it can lead to undefined behavior and other issues. Instead, it is recommended to write an RAII class that properly wraps the HANDLE resource.
+
+This ensures that the HANDLE resource is properly managed and released when it is no longer needed, without relying on the behavior of smart pointers that may not be compatible with HANDLE.
+	
 ```cpp
 /*BAD!!!
 Watch the video:
@@ -796,16 +799,15 @@ std::unique_ptr<HANDLE,std::function<decltype(CloseHandle)>> pHandle(hEvent,Clos
 
 ```
 
-Just do not be lazy. Please. Write an RAII class that wraps void*.
 
 ```cpp
 //Good! Just write a class
 win32_file file(u8"a.txt");
 ```
 
-### Do not assume ```<pthread.h>``` exist for cpu-windows-gnu GCC and clang targets.
+### Avoid assuming the existence of the ```<pthread.h>``` header for GCC and clang targets on Windows.
 
-GCC for windows targets have three different threading ABIs. win32, posix and mcf. Only posix would provide ```<pthread.h>```. Users may use win32 or mcf. Your compilation will break. They may break C++ standard library too and libstdc++ does not provide ```<thread>``` and ```<mutex>``` headers for win32. ```LLVM libc++``` makes this mistake and that is why libc++ is not available for windows targets.
+Windows targets in GCC support three different threading ABIs, including win32, posix, and mcf. Only posix provides the ```<pthread.h>``` header, which may not be available or used by users who opt for win32 or mcf. Relying on ```<pthread.h>``` can cause your compilation to break and may also break the C++ standard library, which does not provide ```<thread>``` and ```<mutex>``` headers for win32. For instance, LLVM libc++ makes this mistake, which is why it is not available for windows targets. Instead of assuming the presence of ```<pthread.h>```, consider using other threading mechanisms that are available on Windows targets.
 
 
 ```cpp
