@@ -224,38 +224,38 @@ We can see C++ standard library implements nothrow version's operator new with t
 In short, you cannot assume there is a default heap that is available.
 
 Reasons:
-1. There is simply no heap. (I know you would argue you can always provide one, but the reality is harsh, my friend.)
-2. Many heaps are available. This situation usually happens within operating system kernels (and even win32 applications with the abi compatibility issue between msvcrt and universal crt) where they provide multiple heaps. Making any of the defaults may be very wrong. For example, the Windows kernel provides different heaps; one is interrupt-safe while space is limited, but the others are not but space is sufficient.
-3. C++ does not provide a thread-local implementation of the heap. The default heap might be highly inefficient. (Of course, thread-local storage might not be available, but that is a separate issue.)
+1. There might not be a heap available at all. While you could argue that you could always provide one, the reality is that this is not always possible.
+2. In some situations, multiple heaps might be available, such as within operating system kernels or even in Win32 applications with ABI compatibility issues between msvcrt and Universal CRT. In these cases, using any of the defaults might be the wrong choice. For example, the Windows kernel provides different heaps, one of which is interrupt-safe but has limited space, while the others are not interrupt-safe but have sufficient space.
+3. C++ does not provide a thread-local implementation of the heap, and the default heap might be highly inefficient. Of course, thread-local storage might not be available, but that is a separate issue.
 
-We can see forcing a default heap implementation never works out for a portable codebase. Just avoid new.
+For a portable codebase, forcing a default heap implementation never works out, so it's best to avoid using new.
 
 ### Avoid handling stack or heap allocation failure.
 
-One design failure with C and C++ is that stack exhaustion is undefined behavior while heap exhaustion is not. That creates inconsistency and a lot of issues.
+It's best to avoid handling stack or heap allocation failure. One design flaw with C and C++ is that stack exhaustion is undefined behavior, while heap exhaustion is not. This creates inconsistency and can lead to a lot of issues.
 
 #### There is no way that you can always handle heap allocation failure to avoid crashing.
 
-In general, you should prefer just call ```std::abort``` if ```malloc(3)``` fails.
+In general, it's preferable to simply call std::abort if malloc(3) fails. Here are some reasons why:
 
-1. Destructors can allocate memory again. That creates a vicious cycle and nobody knows what could happen.
-2. The implementation of GCC libsupc++ uses an emergency heap. However, implementing an emergency would still call ```std::terminate``` in many situations. So you can still get crashing even if it has an "emergency heap." I made the operator a new crash for allocation failure, removed the emergency heap from the libsupc++, and found no issues. No ABI issues. Nothing.
-3. Many libraries beneath you, including Glibc, would call xmalloc, which will still crash for malloc failure. You cannot avoid the issue unless you control all your source code.
-4. Operating Systems like Linux would overcommit and kill your process if you hit allocation failures. In general, programming languages like C++ cannot just handle allocation failures in any meaningful way, neither stack nor heap.
-5. C++ new throws exceptions. C++ codebase will usually allocate memory on the heap with new, creating tons of invisible code-path and potential exception-safety bugs.
+1. Destructors can allocate memory again, creating a vicious cycle that can lead to unpredictable results.
+2. The GCC libsupc++ implementation uses an emergency heap, but even if you implement an emergency heap, it might still call std::terminate in many situations, leading to crashes. To verify this, I removed the emergency heap from the libsupc++ and found no issues, including no ABI issues.
+3. Many libraries beneath you, including Glibc, call xmalloc, which will still crash for malloc failure. You cannot avoid the issue unless you control all your source code.
+4. Operating systems like Linux will overcommit and kill your process if you hit allocation failures. In general, programming languages like C++ cannot handle allocation failures in any meaningful way, whether on the stack or the heap.
+5. C++'s new operator throws exceptions, and C++ codebases usually allocate memory on the heap using new, creating invisible code paths and potential exception-safety bugs.
 
-#### If you want to load large files, consider memory mapping API.
+#### If you want to load large files, consider using the memory mapping API instead of loading them into memory.
 
-I know you will try to make an argument that you want to load large files like image to memory for example. I am sorry, you are usually doing the wrong thing. Instead, you should use fstat(2) or Linux's statx syscall + memory mapping.
+While you might argue that you want to load large files, such as images, to memory, this is usually not the best approach. Instead, you should use fstat(2) or Linux's statx system call and memory mapping.
 
 ##### Advantages
-1. Memory mapping avoids the issue of file size overflow on 32 bits machine.
+1. Memory mapping avoids the issue of file size overflow on 32-bit machines.
 2. It avoids messing up the CRT heap and never triggers allocation failure from malloc or new.
-3. It avoids copying the content from kernel space to user space, compared to loading the entire file to a ```std::string```
+3. It avoids copying the content from kernel space to user space, compared to loading the entire file to a std::string.
 4. Memory mapping allows file sharing among different processes, saving your physical memory.
-5. fseek(3) or seek(2) to load file may create more TOCTOU security vulnerabilities.
+5. fseek(3) or seek(2) to load a file may create more TOCTOU security vulnerabilities.
 6. The overcommit is less likely if you do not write to the copy-on-write pages.
-7. Memory mapping creates ```std::contiguous_range``` which is extremely useful for many workflows.
+7. Memory mapping creates a std::contiguous_range, which is extremely useful for many workflows.
 8. You can write to memory-mapped memory without changing the file's content if you load the pages with private pages. However, writing content to the memory region will trigger a page fault, and the operating system kernel will allocate new pages for your process.
 
 ```cpp
@@ -320,45 +320,44 @@ C++ exception is probably the largest issue for portability. Even Linus Torvalds
 http://harmful.cat-v.org/software/c++/linus
 
 ### Many platforms do not provide exceptions.
-1. C++ exception handling ABI relies on hosted C++ features, and many need operating system support. However, you are writing an operating system; for example, you do not have exceptions.
-2. Architectures like AVR, and wasm cannot natively throw exceptions. wasm32-wasi simply has no exception handling support. (EMSCRIPTEN IS NOT wasm32-wasi) Furthermore, tools like wasm2lua (https://github.com/SwadicalRag/wasm2lua) allow you to compile C++ code to Lua. However, Lua can't implement C++-style exception handling without tons of human effort and severe performance hits.
-3. C++ exceptions on many platforms are extremely slow for both happy and slow paths. SJLJ exception is a typical implementation for many platforms, including 32 bits operating systems and scripting. The performance hit is enormous.
-4. Not every architecture support C++ exceptions, and the implementation difficulty may be very significant.
-5. C++ exceptions need heap, which we mentioned as another huge issue.
-6. C++ exception runtime is enormous. It is usually 100kb, which may be unacceptable for many embedded systems.
-7. C++ exceptions bloat binary size with your code size. That may be another unacceptable factor for many embedded systems.
+The issue with C++ exception handling goes beyond just portability. The reliance on operating system support and hosted C++ features makes it difficult to use in various contexts, including embedded systems and operating system development. This limitation can pose significant challenges for developers who want to write portable code.
 
-### C++ exceptions always slow down performance. They are not "zero-overhead" abstractions.
+The lack of support for exceptions on certain architectures, such as AVR and wasm, is another major challenge. While some tools, such as wasm2lua (https://github.com/SwadicalRag/wasm2lua), allow for the compilation of C++ code to other languages, implementing C++-style exception handling in these contexts can be a difficult and performance-intensive process.
 
-1. Many platforms do not implement table-based exception handling models.
-2. Exceptions always hurt compiler optimizations. (No matter whether it is table-based or sjlj-based.)
-3. Exceptions always hurt TLB, BTB, cache and pages locality. (No matter whether it is table-based or sjlj-based.)
-4. C++ Exception handling does not work very well with ASLR (Address space layout randomization) and PIC (position independent code). This is because the loaders must relocate all exception table pointers. Recently, security papers have talked about how to make that work with the PIC but will break ABIs. (No matter whether it is table-based or sjlj-based.)
-5. C header files usually do not mark their functions correctly with ```noexcept```. That not only creates the issue for performance but they are technically ODR violations. Calling C apis that are not noexcept-marked are just ```undefined-behaviors```. (No matter whether it is table-based or sjlj-based.)
-6. Throwing C++ exceptions is extremely costly. It can be 200x and 300x slower than a syscall instruction on ```x86_64```.
-7. C++ exceptions do not work well in multithreadings systems. See ```C++ exceptions are becoming more and more problematic``` ( https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html ).
-8. Statistics shows 95% of exceptions are just programming bugs. They just create issues for exception-safety and performance issues. Those cases should use assertion or even ```std::terminate``` to deal with instead of throwing exceptions.
+Even on platforms that do support exceptions, the performance hit can be significant. The SJLJ exception, a common implementation for many platforms, can slow down both happy and slow paths. This can make exception handling impractical for performance-critical applications.
 
-### In general, C++ Exceptions are just horrible. Herb Sutter's P0709R0 is our only hope.
-Watch video: https://www.youtube.com/watch?v=ARYP83yNAWk
+Additionally, not every architecture supports C++ exceptions, and even when they do, the implementation difficulty can be significant. The need for heap memory in exception handling, as well as the enormous runtime of C++ exceptions (typically around 100kb), can make it unacceptable for many embedded systems, where binary size and memory usage are critical factors.
+
+Ultimately, the bloat in binary size caused by C++ exceptions is yet another challenge faced by developers in many contexts, including embedded systems. With all of these issues in mind, it is important for developers to carefully consider the use of C++ exception handling in their code and to explore alternative error-handling mechanisms where appropriate.
+
+### C++ exceptions always slow down performance and are not "zero-overhead" abstractions.
+
+1. Many platforms do not implement table-based exception handling models, which are required for C++ exception handling.
+2. C++ exceptions can negatively impact compiler optimizations, regardless of whether the exception handling model is table-based or SJLJ-based.
+3. C++ exceptions can hurt memory locality, including TLB, BTB, cache, and page locality, regardless of the exception handling model.
+4. C++ exception handling does not work well with ASLR (Address Space Layout Randomization) and PIC (Position Independent Code), as loaders must relocate all exception table pointers, which can break ABIs. Recent security papers have discussed ways to make this work with PIC, but it may still break ABIs.
+5. C header files often do not correctly mark their functions with the "noexcept" specifier, creating not only performance issues but also technically violating the One-Definition Rule (ODR). Calling C APIs that are not "noexcept"-marked results in undefined behavior, regardless of the exception handling model.
+6. Throwing C++ exceptions can be extremely costly, potentially taking 200-300 times longer than a syscall instruction on x86_64.
+7. C++ exceptions do not work well in multithreaded systems, which has become a significant problem as more and more software becomes multithreaded. The paper "C++ exceptions are becoming more and more problematic" (https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html) provides more information on this issue.
+8. Statistics show that 95% of exceptions are due to programming bugs, and these cases should be dealt with using assertions or even "std::terminate" rather than throwing exceptions, as this can result in improved exception-safety and performance.
+
+### C++ Exceptions are widely considered to be a significant pain point in the language, with few redeeming qualities. However, some members of the C++ community see hope in proposals like Herb Sutter's P0709R0. For more information, you can watch his video presentation here: https://www.youtube.com/watch?v=ARYP83yNAWk
 
 ## IO
 
-In short. Do not use iostream and stdio. If you have to use iostream and stdio, read this section to understand the pitfalls.
+Avoid using iostream and stdio as they come with many pitfalls.
 
 ### stdio and iostream are NOT freestanding.
 
-That is an issue even with toolchain vendors. LLVM libcxx cannot build without stdio, which breaks bootstrapping. Just do not use them.
+Even toolchain vendors like LLVM libcxx cannot build without stdio, which makes bootstrapping difficult.
 
-### stdio and iostream do not provide the same input and output due to locale.
+### stdio and iostream do not provide consistent input and output due to locale.
 
-Locale can randomly change the behavior of stdio and iostream. That means a program that would work on one machine may not work on another machine.
+The behavior of stdio and iostream can change randomly with locale settings, making a program that works on one machine fail on another.
 
 ### stdio and iostream are not thread-safe.
 
-Locale affects stdio and iostream. Users might change locale at runtime, and that would cause thread-safety issues.
-
-iostream does not have any thread awareness. It does not lock the stream. Different threads would screw up any C++ stream randomly.
+Changes to locale settings at runtime can cause thread-safety issues with stdio and iostream. Additionally, iostream does not have any built-in thread awareness or locking mechanisms, leading to potential issues when multiple threads access the stream.
 
 ### Using ```printf``` family functions incorrectly are always severe security vulnerabilities.
 
@@ -824,23 +823,13 @@ Remember to export the WINEPATH environment in $HOME/.bashrc to include C++ stan
 
 ## OTHER ISSUES
 
-### inline means to prevent ODR violation. Not for hints or expansions.
+### The Purpose of Inline in C++: Preventing ODR Violations, Not for Hints or Expansions.
 
-The keyword is very confusing in C++. It also has different meanings than C.
+The purpose of the inline keyword in C++ is to prevent ODR (One Definition Rule) violations, not for providing hints or expansions. However, the keyword's usage is often confusing due to its different meanings compared to C. If a function with the same signature is defined in multiple translation units, the linker will fail to link them. When a function is marked as inline, the linker can discard any functions with the same signature and keep only one copy, assuming they work the same. However, if they don't work the same, it results in undefined behavior. Additionally, marking a function as inline allows GCC and clang to avoid emitting the function unless it's used, which is important for preventing dead code. For a better understanding of inline, watch the video at https://www.youtube.com/watch?v=6WjKIStrc80 and refer to this article https://devblogs.microsoft.com/oldnewthing/20200521-00/?p=103777.
 
-If you define a function with the same signature in multiple translation units, the linker will complain and won't link. When a function is marked as inline, the linker is free to discard any functions with the same signature and keeps only one copy, assuming these functions work the same. If they do not work the same, that is undefined behavior.
+### To ensure maximum portability, it is recommended to build and test your code on as many GCC cross/canadian toolchains as possible.
 
-Also, when the function is defined as inline, GCC and clang won't emit functions unless used, which is very important for preventing dead code.
-
-Watch video if you want to understand ```inline```.
-https://www.youtube.com/watch?v=6WjKIStrc80
-See also:
-
-https://devblogs.microsoft.com/oldnewthing/20200521-00/?p=103777
-
-### If you want portablity, build as many GCC cross/canadian toolchains as possible.
-
-Building more toolchains gives you room for testing your code on different platforms. That would strictly force you on the behavior you are doing. It also guarantees portability since you test your code on different platforms.
+This will help you identify potential issues early on and allow you to develop a more robust and portable codebase. By testing on various platforms, you can ensure that your code behaves consistently across different systems and architectures, thus minimizing the risk of unexpected behavior and errors.
 
 
 ### Do not use ```std::unique_ptr```
