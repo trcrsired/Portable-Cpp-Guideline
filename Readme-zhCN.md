@@ -57,3 +57,7 @@ D:\Desktop>x86_64-elf-g++ -c builtin_addressof.cc -O3 -std=c++23 -s -flto
 Compilation success
 */
 
+## 避免在 C++23 之前使用 ```std::move```、```std::forward``` 和 ```std::move_if_noexcept```
+
+这些函数被定义在 ```<utility>``` 头文件中，该头文件直到 C++23 才成为完全独立的。为确保最大的可移植性，建议您自己编写这些函数。然而，值得注意的是，最近版本的 Clang 编译器（从版本 15 开始）已经添加了一个补丁，将这些函数视为编译器的魔法。因此，通过自己编写这些函数可能无法实现 100% 的效率。
+
