@@ -64,7 +64,7 @@ Compilation success
 
 ### Avoid ```std::move```, ```std::forward``` and ```std::move_if_noexcept``` Before C++23
 
-The functions ```std::move```, ```std::forward```, and ```std::move_if_noexcept``` are defined in the <utility> header, which is not freestanding. To ensure maximum portability, it's recommended to write these functions yourself. However, it's worth noting that recent versions of the Clang compiler (version 15 onwards) have added a patch that treats these functions as compiler magics. As a result, it may not be possible to achieve 100% efficiency by writing these functions yourself.
+The functions ```std::move```, ```std::forward```, and ```std::move_if_noexcept``` are defined in the ```<utility>``` header, which is not freestanding until C++23. To ensure maximum portability, it's recommended to write these functions yourself. However, it's worth noting that recent versions of the Clang compiler (version 15 onwards) have added a patch that treats these functions as compiler magics. As a result, it may not be possible to achieve 100% efficiency by writing these functions yourself.
 
 ```cpp
 //bad! utility header may not be available.
@@ -85,10 +85,6 @@ move.cc:1:9: fatal error: utility: No such file or directory
 compilation terminated.
 */
 ```
-
-Update:
-
-C++23 finally adds ```<utility>``` as freestanding header and ```std::move```, ```std::forward``` and ```std::move_if_noexcept``` are now freestanding. However, you need to ensure you use latest compilers that support C++23.
 
 ### Avoid ```std::array```
 
