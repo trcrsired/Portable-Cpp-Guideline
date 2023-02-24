@@ -300,7 +300,7 @@ int main()
 ```
 
 
-### Avoid using std::unique_ptr
+### Avoid using ```std::unique_ptr```
 
 1. Overreliance on ```std::unique_ptr``` encourages overuse of OOP, perpetuating the same problems as before.
 2. According to Google, using ```std::unique_ptr``` can cause significant performance inefficiencies, with potential improvements of up to 1.6% observed on certain large server macrobenchmarks. This has also resulted in slightly smaller binary sizes. For more information, refer to the libc++ documentation on [Enable ```std::unique_ptr [[clang::trivial_abi]]```](https://libcxx.llvm.org/DesignDocs/UniquePtrTrivialAbi.html). This indicates that ```std::unique_ptr``` is highly inefficient when considering micro-level performance.
