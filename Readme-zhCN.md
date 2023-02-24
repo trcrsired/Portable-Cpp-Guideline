@@ -1,7 +1,7 @@
 # 可移植的C++指南
 您有兴趣编写可移植和高效的C++代码吗？不要再看其他指南了，来看看这个指南吧！与其他指南（如[C++核心指南](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)）不同，我们的指南优先考虑可移植性并避免有问题的编码实践。
 
-请记住，没有所谓的零成本或零开销（运行时）抽象。请提防任何声称否则的人！即使是借用检查器和C++异常这样的功能也有运行时开销（请参见：[当零成本抽象并非零成本时](https://blog.polybdenum.com/2021/08/09/when-zero-cost-abstractions-aren-t-zero-cost.html)和[零成本异常实际上并非零成本）](https://devblogs.microsoft.com/oldnewthing/20220228-00/?p=106296)。
+请记住，没有所谓的零成本或零开销（运行时）抽象。请提防任何声称否则的人！即使是借用检查器和C++异常这样的功能也有运行时开销（请参见：[当零成本抽象并非零成本时](https://blog.polybdenum.com/2021/08/09/when-zero-cost-abstractions-aren-t-zero-cost.html)和[零成本异常实际上并非零成本](https://devblogs.microsoft.com/oldnewthing/20220228-00/?p=106296)。
 
 请注意，当前的C++标准是C++23。
 
