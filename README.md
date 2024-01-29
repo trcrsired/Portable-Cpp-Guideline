@@ -5,7 +5,7 @@ Are you interested in writing portable and efficient C++ code? Look no further t
 It's important to remember that there's no such thing as a zero-cost or zero-overhead (runtime) abstraction. Beware of anyone who claims otherwise! Even features like borrow checkers and C++ exceptions have runtime overhead (see here: [When Zero Cost Abstractions Aren't Zero Cost
 ](https://blog.polybdenum.com/2021/08/09/when-zero-cost-abstractions-aren-t-zero-cost.html) and here: [Zero-cost exceptions aren’t actually zero cost](https://devblogs.microsoft.com/oldnewthing/20220228-00/?p=106296)).
 
-Note that the current C++ standard is C++23.
+Note that the current C++ standard is C++26.
 
 ## Freestanding
 
@@ -86,9 +86,9 @@ compilation terminated.
 */
 ```
 
-### Avoid ```std::array```
+### Avoid ```std::array``` before C++26
 
-Similar to the reasons why you should avoid using ```std::addressof``` and ```std::move```, the ```<array>``` header is also not freestanding
+Similar to the reasons why you should avoid using ```std::addressof``` and ```std::move```, the ```<array>``` header is also not freestanding before C++26.
 
 ```cpp
 //bad! array header may not be available.
@@ -125,9 +125,6 @@ int main()
 x86_64-elf-g++ -c carray.cc -O3 -std=c++23 -s -flto
 */
 ```
-
-Update:
-In C++23, std::array is not considered freestanding. However, it is possible that it will become freestanding in future versions of the C++ standard.
 
 ### Consider Freestanding Alternatives to C++ Containers, Iterators, Algorithms, and Allocators
 
@@ -195,10 +192,9 @@ operator new (std::size_t sz, const std::nothrow_t&) noexcept
       return nullptr;
     }
 }
-
 ```
 
-We can see C++ standard library implements nothrow version's operator new with thrown version's new. It is completely useless.
+We can see C++ standard library implements nothrow version's ```operator new``` with thrown version's ```operator new```. It is completely useless.
 
 
 ### The default implementation of the heap may be unavailable.
@@ -342,8 +338,7 @@ Ultimately, the bloat in binary size caused by C++ exceptions is yet another cha
 7. C++ exceptions do not work well in multithreaded systems, which has become a significant problem as more and more software becomes multithreaded. The paper [C++ exceptions are becoming more and more problematic](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html) provides more information on this issue.
 8. Statistics show that 95% of exceptions are due to programming bugs, and these cases should be dealt with using assertions or even "std::terminate" rather than throwing exceptions, as this can result in improved exception-safety and performance.
 
-C++ Exceptions are widely considered to be a significant pain point in the language, with few redeeming qualities. However, some members of the C++ community see hope in proposals like Herb Sutter's P0709R0. For more information, you can watch his video presentation here: [De-fragmenting C++: Making Exceptions and RTTI More Affordable and Usable - Herb Sutter CppCon 2019
-](https://www.youtube.com/watch?v=ARYP83yNAWk)
+C++ Exceptions are widely considered to be a significant pain point in the language, with few redeeming qualities. However, some members of the C++ community see hope in proposals like Herb Sutter's P0709R0. For more information, you can watch his video presentation here: [De-fragmenting C++: Making Exceptions and RTTI More Affordable and Usable - Herb Sutter CppCon 2019](https://www.youtube.com/watch?v=ARYP83yNAWk)
 
 ## IO
 
@@ -387,6 +382,12 @@ Another problem with using ```std::endl``` is that it can be redundant. C++ outp
 To avoid these issues, it's generally better to rely on the automatic flushing mechanism built into C++ output streams and avoid using ```std::endl``` altogether. If you do need to flush the buffer at a specific point in your code, you can use the ```flush()``` method on the stream object itself. This method only flushes the buffer and does not insert a new line character, which can improve performance in cases where you do not need to print a new line.
 
 If you want to print your output immediately without buffering, you can use unbuffered streams. However, the C++ stream library does not provide robust support for unbuffered streams, so you may need to use a third-party IO library like ```fast_io``` to achieve this.
+
+### Do not use ```fmt::format```, ```std::format``` and C++23 ```<print>```
+
+The concept of format strings is inherently flawed and leads to security vulnerabilities. Even though C++23 mandates that ```std::format``` accepts only literal parameters, users can still introduce code injection through macros from the build system.
+
+Moreover, the formatters within format are excessively intricate, rendering efficient implementation nearly impossible. These formatters depend on ```std::string```, which is not a freestanding feature. For the sake of portability, it is advisable to steer clear of them.
 
 ### Avoid assuming that ```int8_t```, ```int_least8_t```, or ```int_fast8_t``` are not character types.
 
@@ -635,11 +636,10 @@ While spin locks can be useful in certain situations, it's important to use them
 See Linus Torvalds' rant.
 [No nuances, just buggy code](https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723)
 
-## Todo: OOP
+## OOP
 
 Consider using type-erasure instead of Object-Oriented Programming (OOP). Herb Sutter's Metaclasses can simplify the use of type-erasure and eliminate the need for OOP in most cases.
 
-	
 ### Herb Sutter's Proposal about metaclasses
 
 Herb Sutter's Metaclasses proposal aims to extend the C++ language with a new feature that allows programmers to define custom language extensions, such as type erasure, in a more efficient and safer way. Metaclasses provide a way to generate code at compile-time based on user-defined specifications, without the need for macros or external tools.
@@ -652,8 +652,7 @@ Ensuring code reliability and security is a critical aspect of software developm
 
 Another important practice is fuzzing. Fuzzing involves generating random inputs to a program and monitoring for unexpected behaviors or crashes. This can help uncover bugs or security vulnerabilities that may not be immediately apparent during development.
 
-In terms of efficient bounds checking, it is recommended to use macros like ```_GLIBCXX_ASSERTIONS``` instead of the ```at()``` method for performing bounds checking on the entire C++ standard library. This can significantly improve performance and reduce overhead. See: [How to make "modern" C++ programs safer
-](https://www.youtube.com/watch?v=FAt8KVlNB7E)
+In terms of efficient bounds checking, it is recommended to use macros like ```_GLIBCXX_ASSERTIONS``` instead of the ```at()``` method for performing bounds checking on the entire C++ standard library. This can significantly improve performance and reduce overhead. See: [How to make "modern" C++ programs safer](https://www.youtube.com/watch?v=FAt8KVlNB7E)
 
 Finally, memory tagging is a powerful tool for defending against memory safety bugs. By adding tags to memory allocations, developers can detect buffer overflows, use-after-free errors, and other common memory safety issues. This can help prevent exploits and improve overall program stability.
 
