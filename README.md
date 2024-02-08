@@ -339,6 +339,9 @@ Ultimately, the bloat in binary size caused by C++ exceptions is yet another cha
 
 C++ Exceptions are widely considered to be a significant pain point in the language, with few redeeming qualities. However, some members of the C++ community see hope in proposals like Herb Sutter's P0709R0. For more information, you can watch his video presentation here: [De-fragmenting C++: Making Exceptions and RTTI More Affordable and Usable - Herb Sutter CppCon 2019](https://www.youtube.com/watch?v=ARYP83yNAWk)
 
+### Refrain from attempting to bypass EH (Exception Handling) bans by employing features such as std::expected. 
+```std::expected``` is considerably more cumbersome compared to EH because it lacks ```exception neutrality```. Herb Sutter's Herbception P0709 presents a solution that objectively performs better. Utilizing simplistic fixes like ```std::expected``` only exacerbates the situation surrounding EH.
+
 ## IO
 
 Avoid using iostream and stdio as they come with many pitfalls.
