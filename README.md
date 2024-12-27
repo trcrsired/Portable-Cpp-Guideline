@@ -1012,21 +1012,9 @@ If web apps are not an option, using C/C++ as the core engine for your applicati
 
 Walled garden operating systems like Android do not handle C++ exceptions correctly. It is advisable to avoid using C++ exceptions in your code to prevent compatibility issues and potential runtime errors.
 
-### The Flawed Security Excuse
+### Do not use and buy Windows S mode devices
 
-The argument for these systems is that preventing you from running certain software protects you from untrusted code that might be malware. However, this logic is flawed and reminiscent of oppressive practices where freedom is restricted under the guise of "security." Restricting users and treating them as if they need to be protected from themselves is a monopolistic practice disguised as security. It is entirely feasible to provide options for users to switch between walled garden and open environments, but these options are often withheld to maintain control and monopolistic power.
-
-### Prefer Progressive Web Apps (PWAs)
-
-Progressive Web Apps (PWAs) are preferable over frameworks that are not based on progressive web technologies. PWAs offer greater flexibility and can operate across multiple platforms without being confined by the restrictions of walled garden operating systems.
-
-### Use C/C++ for Core Engines
-
-If web apps are not an option, using C/C++ as the core engine for your applications, with platform-specific languages like Java on Android or Swift on iOS, provides better portability. This approach helps mitigate the restrictions imposed by walled garden operating systems like Android and iOS. By developing the core engine in C/C++, you can save development time and reduce bugs by writing platform-specific interfaces on top of it. Microsoft's failure with the Universal Windows Platform (UWP) was partly due to their ban on C++ and enforcement of managed code.
-
-### Avoid C++ Exceptions
-
-Walled garden operating systems like Android do not handle C++ exceptions correctly. It is advisable to avoid using C++ exceptions in your code to prevent compatibility issues and potential runtime errors.
+Windows S Mode is fundamentally flawed in every aspect. In contrast, Windows S Mode has no Apps. If security is your primary concern, both Android and iPad devices are more affordable options and come with a wide range of apps. It is advisable to switch out of S Mode as soon as possible and avoid enabling it altogether.
 
 ## OTHER ISSUES
 
