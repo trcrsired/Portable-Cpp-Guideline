@@ -984,6 +984,50 @@ Windows targets in GCC support three different threading ABIs, including win32, 
 
 3. Testing and benchmarking your Windows applications on WINE, a compatibility layer that runs Windows apps on Linux, can help avoid issues like ABIs. To include C++ standard library DLLs like libstdc++-6.dll, remember to export the WINEPATH environment in $HOME/.bashrc.
 
+## Walled Gardens
+
+Walled Garden Operating Systems are those that typically block executables from running and also prevent users from installing alternative operating systems by blocking bootloaders. Examples of Walled Garden Operating Systems include Android, iOS, the now-deprecated Microsoft Universal Windows Platform, and Windows S mode. These operating systems typically operate by running all software as apps, rather than traditional executables and programs.
+
+### Beware Walled Gardens
+
+Most people are not familiar with the concept of walled garden operating systems. When designing libraries, it is essential to keep the restrictions and characteristics of these systems in mind. Ensuring compatibility and functionality within walled gardens can be crucial for the usability and adoption of your libraries.
+
+### The Flawed Security Excuse
+
+The argument for these systems is that preventing you from running certain software protects you from untrusted code that might be malware. However, this logic is flawed and reminiscent of oppressive practices where freedom is restricted under the guise of "security." Restricting users and treating them as if they need to be protected from themselves is a monopolistic practice disguised as security. It is entirely feasible to provide options for users to switch between walled garden and open environments, but these options are often withheld to maintain control and monopolistic power.
+
+### Background App Killers
+
+Walled garden operating systems often include background app killers that terminate apps seemingly at random. Be very cautious of these app killers. Interestingly, Android implements background app killing, yet there is little concern from the C++ community, which often complains about program termination due to allocation failures. This discrepancy highlights that many C++ developers may not fully understand the implications of such mechanisms in different environments.
+
+### Prefer Progressive Web Apps (PWAs)
+
+Progressive Web Apps (PWAs) are preferable over frameworks that are not based on progressive web technologies. PWAs offer greater flexibility and can operate across multiple platforms without being confined by the restrictions of walled garden operating systems.
+
+### Use C/C++ for Core Engines
+
+If web apps are not an option, using C/C++ as the core engine for your applications, with platform-specific languages like Java on Android or Swift on iOS, provides better portability. This approach helps mitigate the restrictions imposed by walled garden operating systems like Android and iOS. By developing the core engine in C/C++, you can save development time and reduce bugs by writing platform-specific interfaces on top of it. Microsoft's failure with the Universal Windows Platform (UWP) was partly due to their ban on C++ and enforcement of managed code.
+
+### Avoid C++ Exceptions
+
+Walled garden operating systems like Android do not handle C++ exceptions correctly. It is advisable to avoid using C++ exceptions in your code to prevent compatibility issues and potential runtime errors.
+
+### The Flawed Security Excuse
+
+The argument for these systems is that preventing you from running certain software protects you from untrusted code that might be malware. However, this logic is flawed and reminiscent of oppressive practices where freedom is restricted under the guise of "security." Restricting users and treating them as if they need to be protected from themselves is a monopolistic practice disguised as security. It is entirely feasible to provide options for users to switch between walled garden and open environments, but these options are often withheld to maintain control and monopolistic power.
+
+### Prefer Progressive Web Apps (PWAs)
+
+Progressive Web Apps (PWAs) are preferable over frameworks that are not based on progressive web technologies. PWAs offer greater flexibility and can operate across multiple platforms without being confined by the restrictions of walled garden operating systems.
+
+### Use C/C++ for Core Engines
+
+If web apps are not an option, using C/C++ as the core engine for your applications, with platform-specific languages like Java on Android or Swift on iOS, provides better portability. This approach helps mitigate the restrictions imposed by walled garden operating systems like Android and iOS. By developing the core engine in C/C++, you can save development time and reduce bugs by writing platform-specific interfaces on top of it. Microsoft's failure with the Universal Windows Platform (UWP) was partly due to their ban on C++ and enforcement of managed code.
+
+### Avoid C++ Exceptions
+
+Walled garden operating systems like Android do not handle C++ exceptions correctly. It is advisable to avoid using C++ exceptions in your code to prevent compatibility issues and potential runtime errors.
+
 ## OTHER ISSUES
 
 ### The Purpose of ```inline``` in C++: Preventing ODR Violations, Not for Hints or Expansions.
