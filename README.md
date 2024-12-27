@@ -986,7 +986,7 @@ Windows targets in GCC support three different threading ABIs, including win32, 
 
 ## Walled Gardens
 
-Walled Garden Operating Systems are those that typically block executables from running and also prevent users from installing alternative operating systems by blocking bootloaders. Examples of Walled Garden Operating Systems include Android, iOS, the now-deprecated Microsoft Universal Windows Platform, and Windows S mode. These operating systems typically operate by running all software as apps, rather than traditional executables and programs.
+Walled Garden Operating Systems are those that typically block executables from running and also prevent users from installing alternative operating systems by blocking bootloaders. Examples of Walled Garden Operating Systems include Android, iOS, ChromeOS, the now-deprecated Microsoft Universal Windows Platform, and Windows S mode. These operating systems typically operate by running all software as apps, rather than traditional executables and programs.
 
 ### Beware Walled Gardens
 
