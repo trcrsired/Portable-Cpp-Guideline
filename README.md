@@ -650,6 +650,8 @@ With metaclasses, it might become easier to use type erasure in C++ and, in turn
 
 ## Memory Safety
 
+
+### Compiler flags
 Ensuring code reliability and security is a critical aspect of software development. To achieve this, there are several important practices that developers should follow. Firstly, it is recommended to always run code with sanitizers. This is because sanitizers can detect a wide range of issues such as memory errors, undefined behavior, data races, and more.
 
 Another important practice is fuzzing. Fuzzing involves generating random inputs to a program and monitoring for unexpected behaviors or crashes. This can help uncover bugs or security vulnerabilities that may not be immediately apparent during development.
@@ -658,7 +660,7 @@ In terms of efficient bounds checking, it is recommended to use macros like ```_
 
 Finally, memory tagging is a powerful tool for defending against memory safety bugs. By adding tags to memory allocations, developers can detect buffer overflows, use-after-free errors, and other common memory safety issues. This can help prevent exploits and improve overall program stability.
 
-It's recommended to include the following flags when compiling with GCC and Clang:
+It is recommended to include the following flags when compiling with GCC and Clang:
 
 -Wall -Wextra -Wpedantic -Wmisleading-indentation -Wunused -Wuninitialized -Wshadow -Wconversion
 
@@ -679,6 +681,94 @@ here is an extended explanation of each flag:
 -Wshadow: Warns about variables that shadow other variables with the same name in an outer scope. This can help avoid confusion and unintended behavior.
 
 -Wconversion: Warns about implicit conversions that might result in loss of data or precision. This can help catch potential bugs and improve code quality.
+
+### Fuzz or Lose: Using LLVM LibFuzzer to Detect Bounds Bugs in Your Code
+
+In the ever-evolving world of software development, ensuring the robustness and security of your code is crucial. One effective method for uncovering potential vulnerabilities and bugs is through fuzz testing (fuzzing). LLVM LibFuzzer is a powerful tool that can help developers detect bounds errors in their code.
+
+#### What is Fuzz Testing?
+Fuzz testing is an automated testing technique that involves providing random or specially crafted inputs to a program to observe how it handles unexpected data. This approach is particularly effective at discovering boundary errors, buffer overflows, and other unforeseen behaviors.
+
+#### Why Choose LLVM LibFuzzer?
+LLVM LibFuzzer is an in-process, coverage-guided, evolutionary fuzzing engine. It is designed to work with sanitizers like AddressSanitizer (ASan), ThreadSanitizer (TSan), and UndefinedBehaviorSanitizer (UBSan) to provide a comprehensive testing environment. Here are some advantages:
+- **Efficiency**: LibFuzzer uses coverage information to generate test cases intelligently, quickly covering more code paths.
+- **Integration**: It integrates seamlessly with other LLVM tools, enhancing its error-detection capabilities.
+- **Flexibility**: Developers can customize input formats and test strategies to suit their specific needs.
+
+#### Using LLVM LibFuzzer on Different Platforms
+While some platforms, like Wine, may not support running all sanitizers (e.g., AddressSanitizer), fuzzing remains a valuable technique for detecting bounds errors. Regardless of the environment—whether it's a desktop application or server software—fuzzing can significantly improve code reliability against unexpected inputs.
+
+#### How to Use LLVM LibFuzzer for Fuzz Testing
+1. **Install LLVM and LibFuzzer**:
+   Ensure you have the latest LLVM toolchain installed. You can use a package manager or build from source.
+
+2. **Compile Your Code**:
+   Compile your code with the `-fsanitize=fuzzer` flag. For example:
+   ```sh
+   clang -fsanitize=fuzzer -o my_fuzz_target my_fuzz_target.cpp
+   ```
+
+3. **Run Fuzz Tests**:
+   Execute the compiled fuzz target to start testing:
+   ```sh
+   ./my_fuzz_target
+   ```
+
+4. **Analyze Results**:
+   LibFuzzer will log and report any errors it finds, allowing you to identify and fix issues promptly.
+
+#### Fuzz or Lose
+
+Fuzz testing should be an integral part of your development process. Regularly fuzzing your code can significantly enhance its quality and reduce potential security risks. Remember, **always fuzz your code**!
+
+### Memory Tagging
+
+Memory tagging has been hailed by many security experts as the most promising advancements for enhancing memory safety. By assigning tags to different memory regions and validating them during access, it helps in detecting and preventing various memory-related vulnerabilities, such as use-after-free and buffer overflows.
+
+#### ARM Memory Tagging Extensions
+ARM has developed Memory Tagging Extensions (MTE) to mitigate memory safety issues. MTE assigns a unique tag to each memory region and checks it during memory operations, ensuring that access is within the boundaries and authorized.
+
+Read more about ARM's approach to memory safety with their Memory Tagging Extensions in this [blog post](https://newsroom.arm.com/blog/memory-safety-arm-memory-tagging-extension).
+
+#### My WebAssembly Memory Tagging
+I am working on publishing a paper on WebAssembly Memory Tagging, aiming to introduce similar memory safety features to the WebAssembly ecosystem. This approach will help in safeguarding WebAssembly applications from memory-related vulnerabilities by leveraging tagging techniques.
+
+You can learn more about my efforts and insights through my YouTube presentation [here](https://www.youtube.com/live/8W9faYGooqA?si=8erlPaLNyKe5Y5sv).
+
+### C++ Needs Something Like Safe/Unsafe Keywords/Attributes in the Future
+
+Despite the advancements in existing detection tools and hardening techniques, C++ still lacks mechanisms to enforce safety at a granular level. Unlike languages such as C# and Rust, which offer `safe` and `unsafe` keywords to explicitly mark and verify code safety, C++ has no such inherent capabilities.
+
+There are inherent challenges in proving the safety of code segments statically, and without such mechanisms, developers are often left to rely on external tools that may not cover all edge cases. The introduction of `safe` and `unsafe` attributes in C++ could provide:
+- **Explicit Safety Guarantees**: Allow developers to mark sections of code as `safe`, ensuring they adhere to strict safety checks.
+- **Enhanced Code Readability**: Making it clear which parts of the codebase require careful review and which are guaranteed to be secure.
+- **Improved Tooling**: Enabling better integration with static analysis tools to enforce safety contracts within the code.
+
+Adopting these keywords could significantly improve the overall security and robustness of C++ applications, much like their impact in other languages.
+
+#### Avoid dealing with untrusted input
+
+Handling untrusted input is a significant source of potential bugs and security vulnerabilities. Untrusted input can lead to memory safety bugs, side channels, and various other security issues. This risk is particularly pronounced in applications like web browsers, which inherently deal with untrusted code from various web pages.
+
+##### Why Untrusted Input is Dangerous
+
+###### Memory Safety Bugs
+
+Untrusted input can easily exploit memory safety vulnerabilities such as buffer overflows, use-after-free, and out-of-bounds reads or writes.
+
+These bugs can lead to arbitrary code execution, allowing attackers to take control of the application.
+
+###### Side Channels
+
+Side channels can leak sensitive information through indirect means, such as timing variations or resource usage patterns.
+
+Untrusted input can be crafted to exploit these channels, leading to data breaches or other security incidents.
+
+###### Remote Code Execution
+
+Untrusted input, especially in web browsers, is essentially remote code execution in disguise.
+
+Every web page a browser loads could potentially contain malicious scripts designed to exploit vulnerabilities in the browser or its plugins.
 
 ## Windows specific
 
@@ -778,6 +868,18 @@ See here:
 https://github.com/trcrsired/fast_io/blob/master/include/fast_io_hosted/platforms/win32/msvc_linker.h
 */
 ```
+### Use Lowercase Headers and Libraries for Cross-Compiling
+
+When developing cross-platform applications, it is crucial to consider the case sensitivity of file names. While Windows file systems are generally case insensitive, Linux and other operating systems are case sensitive. To avoid potential issues when compiling your code on different platforms, it is advisable to consistently use lowercase headers and library names.
+
+```cpp
+#include <windows.h>   // Correct
+#include <Windows.h>   // Incorrect
+#include <dbghelp.h>   // Correct
+#include <DbgHelp.h>   // Incorrect
+```
+
+This issue has been highlighted in the [Ninja build issue #2542](https://github.com/ninja-build/ninja/issues/2542), which demonstrates the importance of consistent lowercase usage to avoid cross-compilation problems.
 
 ### Call ```A``` APIS for Windows 9x kernels and ```W``` APIS for Windows NT kernels.
 
