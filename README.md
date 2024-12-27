@@ -1006,7 +1006,7 @@ Progressive Web Apps (PWAs) are preferable over frameworks that are not based on
 
 ### Use C/C++ for Core Engines
 
-If web apps are not an option, using C/C++ as the core engine for your applications, with platform-specific languages like Java on Android or Swift on iOS, provides better portability. This approach helps mitigate the restrictions imposed by walled garden operating systems like Android and iOS. By developing the core engine in C/C++, you can save development time and reduce bugs by writing platform-specific interfaces on top of it. Microsoft's failure with the Universal Windows Platform (UWP) was partly due to their ban on C++ and enforcement of managed code.
+If web apps are not an option, using C/C++ as the core engine for your applications, with platform-specific languages for UI like Java on Android or Swift on iOS, provides better portability. This approach helps mitigate the restrictions imposed by walled garden operating systems like Android and iOS. By developing the core engine in C/C++, you can save development time and reduce bugs by writing platform-specific interfaces on top of it. Microsoft's failure with the Universal Windows Platform (UWP) was partly due to their ban on C++ and enforcement of managed code.
 
 ### Avoid C++ Exceptions
 
