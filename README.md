@@ -648,124 +648,6 @@ Herb Sutter's Metaclasses proposal aims to extend the C++ language with a new fe
 
 With metaclasses, it might become easier to use type erasure in C++ and, in turn, make OOP less necessary in certain situations. However, metaclasses are not yet part of the C++ standard, and their exact design and implementation may change in the future.
 
-## Memory Safety
-
-
-### Compiler flags
-Ensuring code reliability and security is a critical aspect of software development. To achieve this, there are several important practices that developers should follow. Firstly, it is recommended to always run code with sanitizers. This is because sanitizers can detect a wide range of issues such as memory errors, undefined behavior, data races, and more.
-
-Another important practice is fuzzing. Fuzzing involves generating random inputs to a program and monitoring for unexpected behaviors or crashes. This can help uncover bugs or security vulnerabilities that may not be immediately apparent during development.
-
-In terms of efficient bounds checking, it is recommended to use macros like ```_GLIBCXX_ASSERTIONS``` instead of the ```at()``` method for performing bounds checking on the entire C++ standard library. This can significantly improve performance and reduce overhead. See: [How to make "modern" C++ programs safer](https://www.youtube.com/watch?v=FAt8KVlNB7E)
-
-Finally, memory tagging is a powerful tool for defending against memory safety bugs. By adding tags to memory allocations, developers can detect buffer overflows, use-after-free errors, and other common memory safety issues. This can help prevent exploits and improve overall program stability.
-
-It is recommended to include the following flags when compiling with GCC and Clang:
-
--Wall -Wextra -Wpedantic -Wmisleading-indentation -Wunused -Wuninitialized -Wshadow -Wconversion
-
-here is an extended explanation of each flag:
-
--Wall: Enables all warnings that are deemed safe enough to be enabled by default. However, this does not enable all warnings that GCC or Clang is capable of generating.
-
--Wextra: Enables even more warnings, including some that are not enabled by -Wall, such as warnings about uninitialized variables and unused function parameters.
-
--Wpedantic: Enables warnings about non-standard code, as defined by the relevant language standard. This can be useful for ensuring portability of code between different compilers and platforms.
-
--Wmisleading-indentation: Warns about possible misleading indentation, which can lead to code that is difficult to read and understand.
-
--Wunused: Warns about unused variables, functions, and other entities. This can help identify code that is no longer needed, or code that has not yet been completed.
-
--Wuninitialized: Warns about using uninitialized variables. This can help catch potential bugs that might cause undefined behavior.
-
--Wshadow: Warns about variables that shadow other variables with the same name in an outer scope. This can help avoid confusion and unintended behavior.
-
--Wconversion: Warns about implicit conversions that might result in loss of data or precision. This can help catch potential bugs and improve code quality.
-
-## Fuzz or Lose: Using LLVM LibFuzzer to Detect Bounds Bugs in Your Code
-
-In the ever-evolving world of software development, ensuring the robustness and security of your code is crucial. One effective method for uncovering potential vulnerabilities and bugs is through fuzz testing (fuzzing). LLVM LibFuzzer is a powerful tool that can help developers detect bounds errors in their code.
-
-### What is Fuzz Testing?
-Fuzz testing is an automated testing technique that involves providing random or specially crafted inputs to a program to observe how it handles unexpected data. This approach is particularly effective at discovering boundary errors, buffer overflows, and other unforeseen behaviors.
-
-### Why Choose LLVM LibFuzzer?
-LLVM LibFuzzer is an in-process, coverage-guided, evolutionary fuzzing engine. It is designed to work with sanitizers like AddressSanitizer (ASan), ThreadSanitizer (TSan), and UndefinedBehaviorSanitizer (UBSan) to provide a comprehensive testing environment. Here are some advantages:
-- **Efficiency**: LibFuzzer uses coverage information to generate test cases intelligently, quickly covering more code paths.
-- **Integration**: It integrates seamlessly with other LLVM tools, enhancing its error-detection capabilities.
-- **Flexibility**: Developers can customize input formats and test strategies to suit their specific needs.
-
-### Using LLVM LibFuzzer on Different Platforms
-While some platforms, like Wine, may not support running all sanitizers (e.g., AddressSanitizer), fuzzing remains a valuable technique for detecting bounds errors. Regardless of the environment—whether it's a desktop application or server software—fuzzing can significantly improve code reliability against unexpected inputs.
-
-### How to Use LLVM LibFuzzer for Fuzz Testing
-1. **Install LLVM and LibFuzzer**:
-   Ensure you have the latest LLVM toolchain installed. You can use a package manager or build from source.
-
-2. **Compile Your Code**:
-   Compile your code with the `-fsanitize=fuzzer` flag. For example:
-   ```sh
-   clang -fsanitize=fuzzer -o my_fuzz_target my_fuzz_target.cpp
-   ```
-
-3. **Run Fuzz Tests**:
-   Execute the compiled fuzz target to start testing:
-   ```sh
-   ./my_fuzz_target
-   ```
-
-4. **Analyze Results**:
-   LibFuzzer will log and report any errors it finds, allowing you to identify and fix issues promptly.
-
-### Memory Tagging
-
-Memory tagging has been hailed by many security experts as the most promising advancements for enhancing memory safety. By assigning tags to different memory regions and validating them during access, it helps in detecting and preventing various memory-related vulnerabilities, such as use-after-free and buffer overflows.
-
-#### ARM Memory Tagging Extensions
-ARM has developed Memory Tagging Extensions (MTE) to mitigate memory safety issues. MTE assigns a unique tag to each memory region and checks it during memory operations, ensuring that access is within the boundaries and authorized.
-
-Read more about ARM's approach to memory safety with their Memory Tagging Extensions in this [blog post](https://newsroom.arm.com/blog/memory-safety-arm-memory-tagging-extension).
-
-#### My WebAssembly Memory Tagging
-I am working on publishing a paper on WebAssembly Memory Tagging, aiming to introduce similar memory safety features to the WebAssembly ecosystem. This approach will help in safeguarding WebAssembly applications from memory-related vulnerabilities by leveraging tagging techniques.
-
-You can learn more about my efforts and insights through my YouTube presentation [here](https://www.youtube.com/live/8W9faYGooqA?si=8erlPaLNyKe5Y5sv).
-
-### C++ Needs Something Like Safe/Unsafe Keywords/Attributes in the Future
-
-Despite the advancements in existing detection tools and hardening techniques, C++ still lacks mechanisms to enforce safety at a granular level. Unlike languages such as C# and Rust, which offer `safe` and `unsafe` keywords to explicitly mark and verify code safety, C++ has no such inherent capabilities.
-
-There are inherent challenges in proving the safety of code segments statically, and without such mechanisms, developers are often left to rely on external tools that may not cover all edge cases. The introduction of `safe` and `unsafe` attributes in C++ could provide:
-- **Explicit Safety Guarantees**: Allow developers to mark sections of code as `safe`, ensuring they adhere to strict safety checks.
-- **Enhanced Code Readability**: Making it clear which parts of the codebase require careful review and which are guaranteed to be secure.
-- **Improved Tooling**: Enabling better integration with static analysis tools to enforce safety contracts within the code.
-
-Adopting these keywords could significantly improve the overall security and robustness of C++ applications, much like their impact in other languages.
-
-### Avoid dealing with untrusted input
-
-Handling untrusted input is a significant source of potential bugs and security vulnerabilities. Untrusted input can lead to memory safety bugs, side channels, and various other security issues. This risk is particularly pronounced in applications like web browsers, which inherently deal with untrusted code from various web pages.
-
-#### Why Untrusted Input is Dangerous
-
-##### Memory Safety Bugs
-
-Untrusted input can easily exploit memory safety vulnerabilities such as buffer overflows, use-after-free, and out-of-bounds reads or writes.
-
-These bugs can lead to arbitrary code execution, allowing attackers to take control of the application.
-
-##### Side Channels
-
-Side channels can leak sensitive information through indirect means, such as timing variations or resource usage patterns.
-
-Untrusted input can be crafted to exploit these channels, leading to data breaches or other security incidents.
-
-##### Remote Code Execution
-
-Untrusted input, especially in web browsers, is essentially remote code execution in disguise.
-
-Every web page a browser loads could potentially contain malicious scripts designed to exploit vulnerabilities in the browser or its plugins.
-
 ## Windows specific
 
 ### Guard Windows specific code with ```#if (defined(_WIN32) && !defined(__WINE__)) || defined(__CYGWIN__)```
@@ -983,6 +865,123 @@ Windows targets in GCC support three different threading ABIs, including win32, 
 2. Be aware of the ABI differences between win32, posix, and mcf of GCC libstdc++-6.dll. Linking to the wrong C++ standard library runtime can cause iostream to break.
 
 3. Testing and benchmarking your Windows applications on WINE, a compatibility layer that runs Windows apps on Linux, can help avoid issues like ABIs. To include C++ standard library DLLs like libstdc++-6.dll, remember to export the WINEPATH environment in $HOME/.bashrc.
+
+## Memory Safety
+
+### Compiler flags
+Ensuring code reliability and security is a critical aspect of software development. To achieve this, there are several important practices that developers should follow. Firstly, it is recommended to always run code with sanitizers. This is because sanitizers can detect a wide range of issues such as memory errors, undefined behavior, data races, and more.
+
+Another important practice is fuzzing. Fuzzing involves generating random inputs to a program and monitoring for unexpected behaviors or crashes. This can help uncover bugs or security vulnerabilities that may not be immediately apparent during development.
+
+In terms of efficient bounds checking, it is recommended to use macros like ```_GLIBCXX_ASSERTIONS``` instead of the ```at()``` method for performing bounds checking on the entire C++ standard library. This can significantly improve performance and reduce overhead. See: [How to make "modern" C++ programs safer](https://www.youtube.com/watch?v=FAt8KVlNB7E)
+
+Finally, memory tagging is a powerful tool for defending against memory safety bugs. By adding tags to memory allocations, developers can detect buffer overflows, use-after-free errors, and other common memory safety issues. This can help prevent exploits and improve overall program stability.
+
+It is recommended to include the following flags when compiling with GCC and Clang:
+
+-Wall -Wextra -Wpedantic -Wmisleading-indentation -Wunused -Wuninitialized -Wshadow -Wconversion
+
+here is an extended explanation of each flag:
+
+-Wall: Enables all warnings that are deemed safe enough to be enabled by default. However, this does not enable all warnings that GCC or Clang is capable of generating.
+
+-Wextra: Enables even more warnings, including some that are not enabled by -Wall, such as warnings about uninitialized variables and unused function parameters.
+
+-Wpedantic: Enables warnings about non-standard code, as defined by the relevant language standard. This can be useful for ensuring portability of code between different compilers and platforms.
+
+-Wmisleading-indentation: Warns about possible misleading indentation, which can lead to code that is difficult to read and understand.
+
+-Wunused: Warns about unused variables, functions, and other entities. This can help identify code that is no longer needed, or code that has not yet been completed.
+
+-Wuninitialized: Warns about using uninitialized variables. This can help catch potential bugs that might cause undefined behavior.
+
+-Wshadow: Warns about variables that shadow other variables with the same name in an outer scope. This can help avoid confusion and unintended behavior.
+
+-Wconversion: Warns about implicit conversions that might result in loss of data or precision. This can help catch potential bugs and improve code quality.
+
+## Fuzz or Lose: Using LLVM LibFuzzer to Detect Bounds Bugs in Your Code
+
+In the ever-evolving world of software development, ensuring the robustness and security of your code is crucial. One effective method for uncovering potential vulnerabilities and bugs is through fuzz testing (fuzzing). LLVM LibFuzzer is a powerful tool that can help developers detect bounds errors in their code.
+
+### What is Fuzz Testing?
+Fuzz testing is an automated testing technique that involves providing random or specially crafted inputs to a program to observe how it handles unexpected data. This approach is particularly effective at discovering boundary errors, buffer overflows, and other unforeseen behaviors.
+
+### Why Choose LLVM LibFuzzer?
+LLVM LibFuzzer is an in-process, coverage-guided, evolutionary fuzzing engine. It is designed to work with sanitizers like AddressSanitizer (ASan), ThreadSanitizer (TSan), and UndefinedBehaviorSanitizer (UBSan) to provide a comprehensive testing environment. Here are some advantages:
+- **Efficiency**: LibFuzzer uses coverage information to generate test cases intelligently, quickly covering more code paths.
+- **Integration**: It integrates seamlessly with other LLVM tools, enhancing its error-detection capabilities.
+- **Flexibility**: Developers can customize input formats and test strategies to suit their specific needs.
+
+### Using LLVM LibFuzzer on Different Platforms
+While some platforms, like Wine, may not support running all sanitizers (e.g., AddressSanitizer), fuzzing remains a valuable technique for detecting bounds errors. Regardless of the environment—whether it's a desktop application or server software—fuzzing can significantly improve code reliability against unexpected inputs.
+
+### How to Use LLVM LibFuzzer for Fuzz Testing
+1. **Install LLVM and LibFuzzer**:
+   Ensure you have the latest LLVM toolchain installed. You can use a package manager or build from source.
+
+2. **Compile Your Code**:
+   Compile your code with the `-fsanitize=fuzzer` flag. For example:
+   ```sh
+   clang -fsanitize=fuzzer -o my_fuzz_target my_fuzz_target.cpp
+   ```
+
+3. **Run Fuzz Tests**:
+   Execute the compiled fuzz target to start testing:
+   ```sh
+   ./my_fuzz_target
+   ```
+
+4. **Analyze Results**:
+   LibFuzzer will log and report any errors it finds, allowing you to identify and fix issues promptly.
+
+### Memory Tagging
+
+Memory tagging has been hailed by many security experts as the most promising advancements for enhancing memory safety. By assigning tags to different memory regions and validating them during access, it helps in detecting and preventing various memory-related vulnerabilities, such as use-after-free and buffer overflows.
+
+#### ARM Memory Tagging Extensions
+ARM has developed Memory Tagging Extensions (MTE) to mitigate memory safety issues. MTE assigns a unique tag to each memory region and checks it during memory operations, ensuring that access is within the boundaries and authorized.
+
+Read more about ARM's approach to memory safety with their Memory Tagging Extensions in this [blog post](https://newsroom.arm.com/blog/memory-safety-arm-memory-tagging-extension).
+
+#### My WebAssembly Memory Tagging
+I am working on publishing a paper on WebAssembly Memory Tagging, aiming to introduce similar memory safety features to the WebAssembly ecosystem. This approach will help in safeguarding WebAssembly applications from memory-related vulnerabilities by leveraging tagging techniques.
+
+You can learn more about my efforts and insights through my YouTube presentation [here](https://www.youtube.com/live/8W9faYGooqA?si=8erlPaLNyKe5Y5sv).
+
+### C++ Needs Something Like Safe/Unsafe Keywords/Attributes in the Future
+
+Despite the advancements in existing detection tools and hardening techniques, C++ still lacks mechanisms to enforce safety at a granular level. Unlike languages such as C# and Rust, which offer `safe` and `unsafe` keywords to explicitly mark and verify code safety, C++ has no such inherent capabilities.
+
+There are inherent challenges in proving the safety of code segments statically, and without such mechanisms, developers are often left to rely on external tools that may not cover all edge cases. The introduction of `safe` and `unsafe` attributes in C++ could provide:
+- **Explicit Safety Guarantees**: Allow developers to mark sections of code as `safe`, ensuring they adhere to strict safety checks.
+- **Enhanced Code Readability**: Making it clear which parts of the codebase require careful review and which are guaranteed to be secure.
+- **Improved Tooling**: Enabling better integration with static analysis tools to enforce safety contracts within the code.
+
+Adopting these keywords could significantly improve the overall security and robustness of C++ applications, much like their impact in other languages.
+
+### Avoid dealing with untrusted input
+
+Handling untrusted input is a significant source of potential bugs and security vulnerabilities. Untrusted input can lead to memory safety bugs, side channels, and various other security issues. This risk is particularly pronounced in applications like web browsers, which inherently deal with untrusted code from various web pages.
+
+#### Why Untrusted Input is Dangerous
+
+##### Memory Safety Bugs
+
+Untrusted input can easily exploit memory safety vulnerabilities such as buffer overflows, use-after-free, and out-of-bounds reads or writes.
+
+These bugs can lead to arbitrary code execution, allowing attackers to take control of the application.
+
+##### Side Channels
+
+Side channels can leak sensitive information through indirect means, such as timing variations or resource usage patterns.
+
+Untrusted input can be crafted to exploit these channels, leading to data breaches or other security incidents.
+
+##### Remote Code Execution
+
+Untrusted input, especially in web browsers, is essentially remote code execution in disguise.
+
+Every web page a browser loads could potentially contain malicious scripts designed to exploit vulnerabilities in the browser or its plugins.
 
 ## Walled Gardens
 
