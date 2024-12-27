@@ -746,25 +746,25 @@ There are inherent challenges in proving the safety of code segments statically,
 
 Adopting these keywords could significantly improve the overall security and robustness of C++ applications, much like their impact in other languages.
 
-#### Avoid dealing with untrusted input
+### Avoid dealing with untrusted input
 
 Handling untrusted input is a significant source of potential bugs and security vulnerabilities. Untrusted input can lead to memory safety bugs, side channels, and various other security issues. This risk is particularly pronounced in applications like web browsers, which inherently deal with untrusted code from various web pages.
 
-##### Why Untrusted Input is Dangerous
+#### Why Untrusted Input is Dangerous
 
-###### Memory Safety Bugs
+##### Memory Safety Bugs
 
 Untrusted input can easily exploit memory safety vulnerabilities such as buffer overflows, use-after-free, and out-of-bounds reads or writes.
 
 These bugs can lead to arbitrary code execution, allowing attackers to take control of the application.
 
-###### Side Channels
+##### Side Channels
 
 Side channels can leak sensitive information through indirect means, such as timing variations or resource usage patterns.
 
 Untrusted input can be crafted to exploit these channels, leading to data breaches or other security incidents.
 
-###### Remote Code Execution
+##### Remote Code Execution
 
 Untrusted input, especially in web browsers, is essentially remote code execution in disguise.
 
