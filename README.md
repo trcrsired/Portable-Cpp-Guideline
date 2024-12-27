@@ -1015,6 +1015,7 @@ Walled garden operating systems like Android do not handle C++ exceptions correc
 ### Do not use and buy Windows S mode devices
 
 Windows S Mode is fundamentally flawed in every aspect. Windows S Mode has no Apps. If security is your primary concern, both Android and iPad devices are more affordable options and come with a wide range of Apps. It is advisable to switch out of S Mode as soon as possible and avoid enabling it altogether.
+[Creator of Rufus outlines the problems with Microsoft's UWP](https://www.reddit.com/r/programming/comments/noagrx/creator_of_rufus_outlines_the_problems_with/)
 
 ## OTHER ISSUES
 
