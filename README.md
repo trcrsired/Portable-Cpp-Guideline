@@ -858,6 +858,9 @@ Windows targets in GCC support three different threading ABIs, including win32, 
 #include<threads.h>
 ```
 
+### DO NOT USE ARM64EC
+See [Why Microsoft ARM64EC/ARM64X ABI MUST DIE]
+
 ### Others
 
 1. For cpu-windows-gnu clang triple targets, it's best to avoid using thread_local and _Thread since clang does not correctly implement GCC's ABI for Windows.
