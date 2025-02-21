@@ -859,7 +859,7 @@ Windows targets in GCC support three different threading ABIs, including win32, 
 ```
 
 ### DO NOT USE ARM64EC
-See [Why Microsoft ARM64EC/ARM64X ABI MUST DIE]
+See [Why Microsoft ARM64EC/ARM64X ABI MUST DIE](https://github.com/trcrsired/Why-Microsoft-ARM64EC-ABI-MUST-DIE/blob/main/README.md)
 
 ### Others
 
