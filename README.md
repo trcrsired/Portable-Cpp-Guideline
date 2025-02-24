@@ -308,7 +308,7 @@ int main()
 12. Most importantly, ```std::unique_ptr<T>``` lacks type richness, making it unclear what ```std::unique_ptr<shape>``` signifies. Writing ```T``` instead of ```std::unique_ptr<T>``` would provide more clarity and meaning.
 
 In general, ```std::unique_ptr``` is not a smart pointer but rather a questionable pointer type that can be harmful.
-	
+
 ## Exceptions
 
 C++ exception is probably the largest issue for portability. Even Linus Torvalds complaint about C++ EH before.
@@ -502,6 +502,10 @@ char ch{};
 if(fast_io::char_category::is_c_upper(ch))//ok
 	print("Do something\n");
 ```
+
+## Contracts
+
+Avoid using C++26 Contracts. They can lead to One Definition Rule (ODR) violations and significantly bloat your binary by introducing iostream dependencies. Additionally, the C++ standard permits the option to ignore contracts and continue execution, which poses a significant security risk.
 
 ## Integers
 
