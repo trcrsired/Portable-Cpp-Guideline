@@ -652,6 +652,40 @@ Herb Sutter's Metaclasses proposal aims to extend the C++ language with a new fe
 
 With metaclasses, it might become easier to use type erasure in C++ and, in turn, make OOP less necessary in certain situations. However, metaclasses are not yet part of the C++ standard, and their exact design and implementation may change in the future.
 
+
+## OOP
+
+### Avoid private fields and methods
+The private keyword prevents code from being tested, which is a huge issue.
+```cpp
+#define private public
+```
+is very legitimate use case for testing.
+
+### Prefer free functions over methods
+
+Free functions are more flexible, and detached from the class implementation itself (like addons). It often creates performance benefit since we can tweak the function being called by not passing the hidden this pointer. It also has no testing issues unlike private methods.
+
+### Avoid new/unique_ptr
+The reason why C++ new is so overused i guess is exactly because of OOP abuse.
+Here is your text with grammar corrected and no expansions:
+
+Prefer free functions over methods
+Free functions are more flexible and detached from the class implementation itself (like add‑ons). They often provide performance benefits since we can tweak the function being called without passing the hidden this pointer. They also avoid the testing issues associated with private methods
+
+### Use type erasure over virtual functions for polymorphism
+
+### Prefer C style pesudo vtable singleton over C++ vtable, especially after C++20 where we have designated initializers.
+
+The C++ vtable is not ABI-portable across C++ implementations, and the cost of RTTI is completely unnecessary. The Itanium ABI also includes things like ```__cxa_pure_virtual```, which prevents virtual functions from being used without defining that symbol, wasting ROM space.
+
+Designated initializers combined with lambdas make defining this simple and flexible, without dealing with the problems of the Itanium ABI or the MSVC ABI.
+
+### Avoid new/unique_ptr
+The reason why C++ new/unique_ptr are so overused i guess is exactly because of OOP abuse.
+
+### If you have to use virtual methods, remember to always mark either ```virtual```, ```override``` or ```final```.
+
 ## Windows specific
 
 ### Guard Windows specific code with ```#if (defined(_WIN32) && !defined(__WINE__)) || defined(__CYGWIN__)```
