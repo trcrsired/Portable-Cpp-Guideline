@@ -652,9 +652,6 @@ Herb Sutter's Metaclasses proposal aims to extend the C++ language with a new fe
 
 With metaclasses, it might become easier to use type erasure in C++ and, in turn, make OOP less necessary in certain situations. However, metaclasses are not yet part of the C++ standard, and their exact design and implementation may change in the future.
 
-
-## OOP
-
 ### Avoid private fields and methods
 The private keyword prevents code from being tested, which is a huge issue.
 ```cpp
